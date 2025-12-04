@@ -64,6 +64,7 @@ export default function EditProductPage() {
   const [fetchLoading, setFetchLoading] = useState(true)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [categories, setCategories] = useState<any[]>([])
 
   // 1. Basic Info
   const [nameAr, setNameAr] = useState('')
@@ -74,10 +75,18 @@ export default function EditProductPage() {
   const [originalPrice, setOriginalPrice] = useState('')
   const [stock, setStock] = useState('')
   const [warranty, setWarranty] = useState('')
-  const [category, setCategory] = useState('smartphones')
+  const [category, setCategory] = useState('')
 
-  // 2. Images (6 images)
-  const [images, setImages] = useState(['', '', '', '', '', ''])
+  // Fetch categories
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`)
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(err => console.error('Error loading categories:', err))
+  }, [])
+
+  // 2. Images (dynamic - unlimited)
+  const [images, setImages] = useState<string[]>([''])
 
   // 3. Colors & Storage (as arrays)
   const [colors, setColors] = useState<string[]>([''])
@@ -164,16 +173,9 @@ export default function EditProductPage() {
           setWarranty(product.warranty || '')
           setCategory(product.category || 'smartphones')
           
-          // Set images (ensure 6 slots)
+          // Set images (dynamic - keep all existing images)
           const productImages = product.images || []
-          setImages([
-            productImages[0] || '',
-            productImages[1] || '',
-            productImages[2] || '',
-            productImages[3] || '',
-            productImages[4] || '',
-            productImages[5] || '',
-          ])
+          setImages(productImages.length > 0 ? productImages : [''])
           
           // Set colors and storage
           setColors(product.colors?.length > 0 ? product.colors : [''])
@@ -434,16 +436,22 @@ export default function EditProductPage() {
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-600"
+                    required
                   >
-                    <option value="smartphones">جوالات</option>
-                    <option value="tablets">أجهزة لوحية</option>
-                    <option value="smartwatches">ساعات ذكية</option>
-                    <option value="headphones">سماعات</option>
+                    {categories.length === 0 ? (
+                      <option value="">جاري التحميل...</option>
+                    ) : (
+                      categories.map((cat) => (
+                        <option key={cat.slug} value={cat.slug}>
+                          {cat.icon} {cat.name}
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold mb-2">السعر *</label>
+                  <label className="block text-sm font-bold mb-2">السعر (قبل الضريبة) *</label>
                   <input
                     type="number"
                     value={price}
@@ -453,10 +461,21 @@ export default function EditProductPage() {
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-600"
                     required
                   />
+                  <p className="text-xs text-gray-500 mt-2">
+                    💡 <strong>ملاحظة:</strong> السعر المدخل هو سعر المنتج قبل الضريبة. سيتم إضافة ضريبة القيمة المضافة (15%) تلقائياً عند الدفع.
+                    <br />
+                    <span className="text-primary-600 font-medium">
+                      {price && !isNaN(parseFloat(price)) ? (
+                        <>السعر النهائي للعميل: {(parseFloat(price) * 1.15).toFixed(2)} ريال (شامل الضريبة)</>
+                      ) : (
+                        'أدخل السعر لرؤية السعر النهائي'
+                      )}
+                    </span>
+                  </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold mb-2">السعر الأصلي</label>
+                  <label className="block text-sm font-bold mb-2">السعر الأصلي (قبل الخصم)</label>
                   <input
                     type="number"
                     value={originalPrice}
@@ -465,6 +484,9 @@ export default function EditProductPage() {
                     placeholder="3499"
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-600"
                   />
+                  <p className="text-xs text-gray-500 mt-2">
+                    اختياري - لعرض نسبة الخصم (يجب أن يكون أكبر من السعر الحالي)
+                  </p>
                 </div>
 
                 <div>
@@ -495,81 +517,89 @@ export default function EditProductPage() {
 
             {/* 2. الصور */}
             <div className="bg-white rounded-2xl p-6">
-              <h2 className="text-xl font-bold mb-6">2️⃣ الصور (6 صور)</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold">2️⃣ الصور ({images.filter(img => img).length} صورة)</h2>
+                <button
+                  type="button"
+                  onClick={() => setImages([...images, ''])}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+                >
+                  <FiPlus size={18} />
+                  <span>إضافة صورة</span>
+                </button>
+              </div>
               
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {images.map((image, index) => (
-                  <div key={index}>
-                    <label className="block text-sm font-bold mb-2">صورة {index + 1}</label>
-                    
+                  <div key={index} className="relative">
                     {/* Preview */}
-                    {image && (
-                      <div className="mb-3 relative aspect-square">
+                    {image ? (
+                      <div className="relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200">
                         {image.startsWith('data:image') || image.startsWith('http') ? (
-                          <img src={image} alt={`صورة ${index + 1}`} className="w-full h-full object-cover rounded-xl" />
+                          <img src={image} alt={`صورة ${index + 1}`} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl flex items-center justify-center text-6xl">
+                          <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center text-4xl">
                             {image}
                           </div>
                         )}
                         <button
                           type="button"
                           onClick={() => {
+                            const newImages = images.filter((_, i) => i !== index)
+                            setImages(newImages.length > 0 ? newImages : [''])
+                          }}
+                          className="absolute top-1 right-1 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition shadow-lg"
+                        >
+                          <FiTrash2 size={14} />
+                        </button>
+                        <div className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-sm text-white px-2 py-0.5 rounded text-xs">
+                          {index + 1}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-primary-400 transition">
+                        <label className="cursor-pointer flex flex-col items-center gap-2 p-4">
+                          <FiImage size={24} className="text-gray-400" />
+                          <span className="text-xs text-gray-500 text-center">رفع صورة</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0]
+                              if (file) {
+                                try {
+                                  const compressed = await compressImage(file, 800, 0.7)
+                                  const newImages = [...images]
+                                  newImages[index] = compressed
+                                  setImages(newImages)
+                                } catch (error) {
+                                  console.error('Error compressing image:', error)
+                                  alert('فشل ضغط الصورة')
+                                }
+                              }
+                            }}
+                          />
+                        </label>
+                        <input
+                          type="text"
+                          onChange={(e) => {
                             const newImages = [...images]
-                            newImages[index] = ''
+                            newImages[index] = e.target.value
                             setImages(newImages)
                           }}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition shadow-lg"
-                        >
-                          <FiX size={16} />
-                        </button>
+                          placeholder="📱"
+                          className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm"
+                        />
                       </div>
                     )}
-                    
-                    {/* Upload Button */}
-                    <div className="flex gap-2">
-                      <label className="flex-1 cursor-pointer">
-                        <div className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-primary-300 text-primary-600 rounded-xl hover:bg-primary-50 transition">
-                          <FiImage size={20} />
-                          <span>رفع صورة</span>
-                        </div>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={async (e) => {
-                            const file = e.target.files?.[0]
-                            if (file) {
-                              try {
-                                // Compress image before saving
-                                const compressed = await compressImage(file, 800, 0.7)
-                                const newImages = [...images]
-                                newImages[index] = compressed
-                                setImages(newImages)
-                              } catch (error) {
-                                console.error('Error compressing image:', error)
-                                alert('فشل ضغط الصورة')
-                              }
-                            }
-                          }}
-                        />
-                      </label>
-                      
-                      <input
-                        type="text"
-                        value={image.startsWith('data:image') ? '' : image}
-                        onChange={(e) => {
-                          const newImages = [...images]
-                          newImages[index] = e.target.value
-                          setImages(newImages)
-                        }}
-                        placeholder="أو إيموجي 📱"
-                        className="w-24 px-3 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-600 text-center"
-                      />
-                    </div>
                   </div>
                 ))}
               </div>
+              
+              <p className="text-xs text-gray-500 mt-4">
+                💡 يمكنك إضافة عدد غير محدود من الصور. الصورة الأولى ستكون الصورة الرئيسية.
+              </p>
             </div>
 
             {/* 3. الألوان والسعات */}

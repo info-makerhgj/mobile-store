@@ -15,6 +15,8 @@ interface ShippingProvider {
   apiUrl?: string;
   testMode: boolean;
   settings?: any;
+  defaultPrice?: number;
+  defaultDays?: number;
 }
 
 export default function ShippingSettings() {
@@ -111,18 +113,57 @@ export default function ShippingSettings() {
           </div>
         )}
 
-        <div className="space-y-6">
-          {providers.map((provider) => (
-            <ProviderCard
-              key={provider.id}
-              provider={provider}
-              onToggle={handleToggleProvider}
-              onToggleTestMode={handleToggleTestMode}
-              onSave={handleSaveCredentials}
-              saving={saving}
-            />
-          ))}
-        </div>
+        {providers.length === 0 ? (
+          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-8 text-center">
+            <div className="text-6xl mb-4">📦</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">لم يتم تهيئة شركات الشحن</h3>
+            <p className="text-gray-600 mb-6">
+              يجب تشغيل سكريبت التهيئة أولاً لإضافة شركات الشحن إلى قاعدة البيانات
+            </p>
+            
+            <div className="bg-white rounded-lg p-6 text-right max-w-2xl mx-auto mb-6">
+              <h4 className="font-bold text-lg mb-4">📋 خطوات التهيئة:</h4>
+              <ol className="space-y-3 text-gray-700">
+                <li className="flex items-start gap-3">
+                  <span className="font-bold text-primary-600">1.</span>
+                  <span>افتح Terminal في مجلد المشروع</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="font-bold text-primary-600">2.</span>
+                  <span>شغّل الأمر: <code className="bg-gray-100 px-2 py-1 rounded">SETUP_SHIPPING.bat</code></span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="font-bold text-primary-600">3.</span>
+                  <span>انتظر حتى تكتمل التهيئة</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="font-bold text-primary-600">4.</span>
+                  <span>حدّث هذه الصفحة</span>
+                </li>
+              </ol>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-right max-w-2xl mx-auto">
+              <p className="text-sm text-blue-800">
+                💡 <strong>ملاحظة:</strong> السكريبت سيضيف 3 شركات شحن جاهزة (سمسا، ريدبكس، أرامكس) مع أسعار الشحن لجميع المدن السعودية.
+                فقط تحتاج إضافة مفاتيح API من لوحة التحكم هذه.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {providers.map((provider) => (
+              <ProviderCard
+                key={provider.id}
+                provider={provider}
+                onToggle={handleToggleProvider}
+                onToggleTestMode={handleToggleTestMode}
+                onSave={handleSaveCredentials}
+                saving={saving}
+              />
+            ))}
+          </div>
+        )}
 
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
           <h3 className="text-lg font-bold text-blue-900 mb-3">📋 معلومات مهمة</h3>
@@ -158,6 +199,8 @@ function ProviderCard({
     apiSecret: provider.apiSecret || '',
     apiUrl: provider.apiUrl || '',
     accountNumber: provider.settings?.accountNumber || '',
+    defaultPrice: provider.defaultPrice || 30,
+    defaultDays: provider.defaultDays || 3,
   });
 
   const getProviderIcon = () => {
@@ -175,6 +218,8 @@ function ProviderCard({
       apiKey: formData.apiKey,
       apiSecret: formData.apiSecret,
       apiUrl: formData.apiUrl || undefined,
+      defaultPrice: parseFloat(formData.defaultPrice.toString()),
+      defaultDays: parseInt(formData.defaultDays.toString()),
     };
     
     if (provider.name === 'aramex' && formData.accountNumber) {
@@ -240,6 +285,43 @@ function ProviderCard({
                 />
                 <span className="text-sm text-gray-700">استخدام الوضع التجريبي (بدون اتصال حقيقي)</span>
               </label>
+            </div>
+
+            {/* إعدادات السعر الافتراضي */}
+            <div className="bg-gray-50 rounded-lg p-4 border-2 border-gray-200">
+              <h4 className="font-bold text-gray-900 mb-3">💰 السعر الافتراضي لجميع المدن</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    السعر (ريال)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.defaultPrice}
+                    onChange={(e) => setFormData({ ...formData, defaultPrice: parseFloat(e.target.value) || 0 })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="30"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    أيام التوصيل
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.defaultDays}
+                    onChange={(e) => setFormData({ ...formData, defaultDays: parseInt(e.target.value) || 0 })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="3"
+                    min="1"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                💡 هذا السعر سيُطبق على جميع مدن السعودية لهذه الشركة
+              </p>
             </div>
 
             {!provider.testMode && (

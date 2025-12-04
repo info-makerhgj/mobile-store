@@ -319,6 +319,7 @@ export const getFeaturedDealsSettings = async (req: Request, res: Response) => {
     // إذا ما في إعدادات، نرجع القيم الافتراضية
     if (!settings) {
       const defaultSettings = {
+        enabled: true,
         title: 'عروض حصرية',
         subtitle: 'خصومات تصل إلى {maxDiscount}% على أفضل الأجهزة',
         bannerTitle: 'عروض لفترة محدودة',
@@ -350,6 +351,7 @@ export const updateFeaturedDealsSettings = async (req: Request, res: Response) =
     const settingsCollection = db.collection('FeaturedDealsSettings')
 
     const updateData = {
+      enabled: req.body.enabled !== undefined ? req.body.enabled : true,
       title: req.body.title,
       subtitle: req.body.subtitle,
       bannerTitle: req.body.bannerTitle,
@@ -370,6 +372,93 @@ export const updateFeaturedDealsSettings = async (req: Request, res: Response) =
     res.json(settings)
   } catch (error) {
     console.error('Error updating featured deals settings:', error)
+    res.status(500).json({ success: false, message: 'Server error' })
+  }
+}
+
+
+// Get exclusive offers settings
+export const getExclusiveOffersSettings = async (req: Request, res: Response) => {
+  try {
+    const client = new MongoClient(process.env.DATABASE_URL || '')
+
+    await client.connect()
+    const db = client.db()
+    const settingsCollection = db.collection('ExclusiveOffersSettings')
+
+    let settings = await settingsCollection.findOne({})
+
+    // إذا ما في إعدادات، نرجع القيم الافتراضية
+    if (!settings) {
+      const defaultSettings = {
+        enabled: true,
+        offer1: {
+          title: 'عرض الجمعة البيضاء',
+          titleEn: 'Black Friday Deal',
+          discount: '50%',
+          description: 'خصم يصل إلى 50% على أجهزة مختارة',
+          descriptionEn: 'Up to 50% off on selected devices',
+          link: '/deals?category=black-friday',
+        },
+        offer2: {
+          title: 'هدية مجانية',
+          titleEn: 'Free Gift',
+          discount: 'هدية',
+          description: 'احصل على سماعات لاسلكية مع كل جهاز',
+          descriptionEn: 'Get free wireless earbuds with every device',
+          link: '/deals?category=free-gift',
+        },
+        offer3: {
+          title: 'عرض محدود',
+          titleEn: 'Limited Offer',
+          discount: '30%',
+          description: 'خصم 30% على الأجهزة الصلبة',
+          descriptionEn: '30% off on rugged devices',
+          link: '/deals?category=rugged',
+        },
+      }
+      
+      await client.close()
+      return res.json(defaultSettings)
+    }
+
+    await client.close()
+
+    res.json(settings)
+  } catch (error) {
+    console.error('Error fetching exclusive offers settings:', error)
+    res.status(500).json({ success: false, message: 'Server error' })
+  }
+}
+
+// Update exclusive offers settings
+export const updateExclusiveOffersSettings = async (req: Request, res: Response) => {
+  try {
+    const client = new MongoClient(process.env.DATABASE_URL || '')
+
+    await client.connect()
+    const db = client.db()
+    const settingsCollection = db.collection('ExclusiveOffersSettings')
+
+    const updateData = {
+      enabled: req.body.enabled !== undefined ? req.body.enabled : true,
+      offer1: req.body.offer1,
+      offer2: req.body.offer2,
+      offer3: req.body.offer3,
+      updatedAt: new Date(),
+    }
+
+    await settingsCollection.updateOne({}, { $set: updateData }, { upsert: true })
+
+    const settings = await settingsCollection.findOne({})
+
+    await client.close()
+
+    console.log('✅ Exclusive offers settings updated')
+
+    res.json(settings)
+  } catch (error) {
+    console.error('Error updating exclusive offers settings:', error)
     res.status(500).json({ success: false, message: 'Server error' })
   }
 }

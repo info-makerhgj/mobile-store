@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX } from 'react-icons/fi'
 import { useCart } from '@/contexts/CartContext'
 import DealsBanner from '@/components/home/DealsBanner'
@@ -24,6 +24,15 @@ function CartButton() {
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [categories, setCategories] = useState<any[]>([])
+
+  // Fetch categories
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`)
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(err => console.error('Error loading categories:', err))
+  }, [])
 
   return (
     <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
@@ -46,10 +55,15 @@ export default function Header() {
           <nav className="hidden lg:flex items-center" style={{ gap: 'var(--space-6)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>
             <Link href="/" className="hover:text-primary-600 transition-base">الرئيسية</Link>
             <Link href="/products" className="hover:text-primary-600 transition-base">جميع المنتجات</Link>
-            <Link href="/products?category=smartphones" className="hover:text-primary-600 transition-base">الجوالات</Link>
-            <Link href="/products?category=tablets" className="hover:text-primary-600 transition-base">الأجهزة اللوحية</Link>
-            <Link href="/products?category=smartwatches" className="hover:text-primary-600 transition-base">الساعات الذكية</Link>
-            <Link href="/products?category=headphones" className="hover:text-primary-600 transition-base">السماعات</Link>
+            {categories.map((cat) => (
+              <Link 
+                key={cat.slug} 
+                href={`/products?category=${cat.slug}`} 
+                className="hover:text-primary-600 transition-base"
+              >
+                {cat.name}
+              </Link>
+            ))}
             <Link href="/deals" className="text-red-600 hover:text-red-700 transition-base flex items-center gap-1">
               <span>🔥</span>
               <span>العروض</span>
@@ -100,10 +114,16 @@ export default function Header() {
           <nav className="container-mobile flex flex-col" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)', gap: 'var(--space-2)', fontSize: 'var(--text-base)' }}>
             <Link href="/" className="hover:text-primary-600 transition-base" style={{ padding: 'var(--space-2) 0' }}>الرئيسية</Link>
             <Link href="/products" className="hover:text-primary-600 transition-base" style={{ padding: 'var(--space-2) 0' }}>جميع المنتجات</Link>
-            <Link href="/products?category=smartphones" className="hover:text-primary-600 transition-base" style={{ padding: 'var(--space-2) 0' }}>الجوالات</Link>
-            <Link href="/products?category=tablets" className="hover:text-primary-600 transition-base" style={{ padding: 'var(--space-2) 0' }}>الأجهزة اللوحية</Link>
-            <Link href="/products?category=smartwatches" className="hover:text-primary-600 transition-base" style={{ padding: 'var(--space-2) 0' }}>الساعات الذكية</Link>
-            <Link href="/products?category=headphones" className="hover:text-primary-600 transition-base" style={{ padding: 'var(--space-2) 0' }}>السماعات</Link>
+            {categories.map((cat) => (
+              <Link 
+                key={cat.slug}
+                href={`/products?category=${cat.slug}`} 
+                className="hover:text-primary-600 transition-base" 
+                style={{ padding: 'var(--space-2) 0' }}
+              >
+                {cat.name}
+              </Link>
+            ))}
             <Link href="/deals" className="text-red-600 transition-base flex items-center gap-2" style={{ padding: 'var(--space-2) 0' }}>
               <span>🔥</span>
               <span>العروض الحصرية</span>

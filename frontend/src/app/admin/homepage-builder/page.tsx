@@ -8,7 +8,7 @@ import { FiPlus, FiEye, FiEyeOff, FiCopy, FiTrash2, FiChevronUp, FiChevronDown, 
 
 interface Section {
   id: string
-  type: 'hero' | 'categories' | 'products' | 'banner' | 'text' | 'imageGrid'
+  type: 'hero' | 'categories' | 'products' | 'banner' | 'text' | 'imageGrid' | 'exclusiveOffers' | 'deals'
   title: string
   subtitle?: string
   order: number
@@ -163,6 +163,8 @@ export default function HomepageBuilderPage() {
       case 'banner': return '🎨'
       case 'text': return '📝'
       case 'imageGrid': return '🖼️'
+      case 'exclusiveOffers': return '🎁'
+      case 'deals': return '🔥'
       default: return '📦'
     }
   }
@@ -175,6 +177,8 @@ export default function HomepageBuilderPage() {
       case 'banner': return 'بنر'
       case 'text': return 'نص'
       case 'imageGrid': return 'شبكة صور'
+      case 'exclusiveOffers': return 'عروض حصرية'
+      case 'deals': return 'العروض الأسبوعية'
       default: return type
     }
   }

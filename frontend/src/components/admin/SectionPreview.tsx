@@ -22,6 +22,10 @@ export default function SectionPreview({ section, products = [] }: SectionPrevie
         return <TextPreview section={section} />
       case 'imageGrid':
         return <ImageGridPreview section={section} />
+      case 'exclusiveOffers':
+        return <ExclusiveOffersPreview />
+      case 'deals':
+        return <DealsPreview />
       default:
         return <div className="text-center text-gray-500 py-8">لا توجد معاينة متاحة</div>
     }
@@ -185,6 +189,79 @@ function ImageGridPreview({ section }: { section: any }) {
             {img.image && <img src={img.image} alt="" className="w-full h-full object-cover" />}
           </div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+
+// Exclusive Offers Preview
+function ExclusiveOffersPreview() {
+  return (
+    <div className="p-4 bg-gray-50" dir="rtl">
+      <div className="text-center mb-4">
+        <h2 className="text-lg font-bold text-gray-900">🎁 عروض حصرية</h2>
+        <p className="text-xs text-gray-600">عروض لفترة محدودة - لا تفوت الفرصة</p>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-3 text-white text-center">
+          <div className="text-2xl mb-1">💎</div>
+          <div className="text-xs font-bold mb-1">عرض محدود</div>
+          <div className="text-lg font-bold">30%</div>
+          <div className="text-xs opacity-90">خصم على الهواتف الذكية</div>
+        </div>
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-3 text-white text-center">
+          <div className="text-2xl mb-1">🎁</div>
+          <div className="text-xs font-bold mb-1">هدية مجانية</div>
+          <div className="text-lg font-bold">2+1</div>
+          <div className="text-xs opacity-90">اشتر 2 واحصل على 1</div>
+        </div>
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg p-3 text-white text-center">
+          <div className="text-2xl mb-1">⚡</div>
+          <div className="text-xs font-bold mb-1">الجمعة البيضاء</div>
+          <div className="text-lg font-bold">50%</div>
+          <div className="text-xs opacity-90">خصم يصل إلى 50%</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Deals Preview
+function DealsPreview() {
+  return (
+    <div className="p-4 bg-white" dir="rtl">
+      <div className="text-center mb-4">
+        <h2 className="text-lg font-bold text-gray-900">🔥 العروض الأسبوعية</h2>
+        <p className="text-xs text-gray-600">أفضل العروض لهذا الأسبوع</p>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="bg-white rounded-lg border border-gray-200 p-2">
+          <div className="bg-gray-200 h-20 rounded mb-2 flex items-center justify-center">
+            <span className="text-gray-400 text-xs">صورة المنتج</span>
+          </div>
+          <div className="text-xs font-bold text-gray-900 mb-1">منتج بعرض خاص</div>
+          <div className="flex items-center gap-1 mb-1">
+            <span className="text-xs text-primary-600 font-bold">299 ر.س</span>
+            <span className="text-xs text-gray-400 line-through">399 ر.س</span>
+          </div>
+          <div className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded inline-block">
+            خصم 25%
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-2">
+          <div className="bg-gray-200 h-20 rounded mb-2 flex items-center justify-center">
+            <span className="text-gray-400 text-xs">صورة المنتج</span>
+          </div>
+          <div className="text-xs font-bold text-gray-900 mb-1">منتج بعرض خاص</div>
+          <div className="flex items-center gap-1 mb-1">
+            <span className="text-xs text-primary-600 font-bold">199 ر.س</span>
+            <span className="text-xs text-gray-400 line-through">299 ر.س</span>
+          </div>
+          <div className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded inline-block">
+            خصم 33%
+          </div>
+        </div>
       </div>
     </div>
   )

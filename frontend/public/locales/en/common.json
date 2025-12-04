@@ -1,0 +1,61 @@
+{
+  "header": {
+    "home": "Home",
+    "allProducts": "All Products",
+    "smartphones": "Smartphones",
+    "tablets": "Tablets",
+    "smartwatches": "Smartwatches",
+    "headphones": "Headphones",
+    "deals": "Deals",
+    "search": "Search for phone, accessory...",
+    "tagline": "New Dimensions for Tech Communication"
+  },
+  "login": {
+    "welcome": "Welcome",
+    "welcomeBack": "Sign in to continue",
+    "createAccount": "Create Account",
+    "createAccountDesc": "Join us and enjoy shopping",
+    "loginTab": "Sign In",
+    "registerTab": "Sign Up",
+    "fullName": "Full Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "agreeTerms": "I agree to",
+    "terms": "Terms & Conditions",
+    "and": "and",
+    "privacy": "Privacy Policy",
+    "loginButton": "Sign In",
+    "registerButton": "Create Account",
+    "loading": "Loading...",
+    "or": "or",
+    "continueGoogle": "Continue with Google",
+    "continueFacebook": "Continue with Facebook",
+    "freeShipping": "Free Shipping",
+    "securePayment": "Secure Payment",
+    "originalProducts": "Original Products",
+    "enterFullName": "Enter your full name",
+    "enterEmail": "example@email.com",
+    "enterPhone": "+966 50 123 4567"
+  },
+  "footer": {
+    "aboutUs": "About Us",
+    "contactUs": "Contact Us",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "returnPolicy": "Return Policy",
+    "warranty": "Warranty",
+    "allRightsReserved": "All Rights Reserved"
+  },
+  "common": {
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "sar": "SAR",
+    "viewDetails": "View Details",
+    "outOfStock": "Out of Stock",
+    "inStock": "In Stock"
+  }
+}

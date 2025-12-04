@@ -71,6 +71,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { path: '/admin', icon: FiHome, label: 'الرئيسية', color: 'from-blue-500 to-blue-600' },
     { path: '/admin/homepage-builder', icon: FiGrid, label: 'الصفحة الرئيسية', color: 'from-purple-500 to-purple-600' },
     { path: '/admin/products', icon: FiPackage, label: 'المنتجات', color: 'from-green-500 to-green-600' },
+    { path: '/admin/categories', icon: FiGrid, label: 'الفئات', color: 'from-pink-500 to-pink-600' },
     { path: '/admin/orders', icon: FiShoppingBag, label: 'الطلبات', color: 'from-orange-500 to-orange-600' },
     { path: '/admin/distribution', icon: FiTruck, label: 'التوزيع', color: 'from-indigo-500 to-indigo-600' },
     { path: '/admin/deals', icon: FiPercent, label: 'العروض', color: 'from-red-500 to-red-600' },

@@ -24,7 +24,16 @@ export const getEnabledProviders = async (req: Request, res: Response) => {
 export const updateProvider = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const provider = await shippingService.updateProvider(id, req.body);
+    const { defaultPrice, defaultDays, ...otherUpdates } = req.body;
+    
+    // تحديث معلومات الشركة
+    const provider = await shippingService.updateProvider(id, otherUpdates);
+    
+    // إذا تم تحديث السعر الافتراضي، حدّث جميع أسعار المدن
+    if (defaultPrice !== undefined || defaultDays !== undefined) {
+      await shippingService.updateProviderPrices(id, defaultPrice, defaultDays);
+    }
+    
     res.json({ success: true, provider });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });

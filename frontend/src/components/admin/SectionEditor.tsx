@@ -107,6 +107,8 @@ export default function SectionEditor({ section, onSave, onClose, products = [] 
                   <option value="banner">🎨 بنر إعلاني</option>
                   <option value="text">📝 قسم نصي</option>
                   <option value="imageGrid">🖼️ شبكة صور</option>
+                  <option value="exclusiveOffers">🎁 عروض حصرية</option>
+                  <option value="deals">🔥 العروض الأسبوعية</option>
                 </select>
               </div>
             )}
@@ -114,15 +116,19 @@ export default function SectionEditor({ section, onSave, onClose, products = [] 
             {/* Common Fields */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold mb-2 text-gray-800">عنوان القسم *</label>
+                <label className="block text-sm font-bold mb-2 text-gray-800">
+                  عنوان القسم <span className="text-gray-400 font-normal">(اختياري)</span>
+                </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 text-base focus:border-primary-500 focus:outline-none"
                   placeholder="مثال: أحدث المنتجات"
-                  required
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  💡 يمكنك ترك العنوان فارغاً إذا كنت تريد عرض المحتوى فقط
+                </p>
               </div>
 
               <div>
@@ -153,6 +159,8 @@ export default function SectionEditor({ section, onSave, onClose, products = [] 
             {sectionType === 'imageGrid' && (
               <ImageGridFields formData={formData} setFormData={setFormData} onImageUpload={handleImageUpload} />
             )}
+            {sectionType === 'exclusiveOffers' && <ExclusiveOffersFields />}
+            {sectionType === 'deals' && <DealsFields />}
           </div>
 
             {/* Footer */}
@@ -196,10 +204,10 @@ export default function SectionEditor({ section, onSave, onClose, products = [] 
 
 // Hero Section Fields
 function HeroFields({ formData, setFormData }: any) {
-  const [slides, setSlides] = useState(formData.content.slides || [{ title: '', subtitle: '', description: '', image: '', buttonText: '', buttonLink: '' }])
+  const [slides, setSlides] = useState(formData.content.slides || [{ image: '', mobileImage: '', link: '' }])
 
   const addSlide = () => {
-    const newSlides = [...slides, { title: '', subtitle: '', description: '', image: '', buttonText: '', buttonLink: '' }]
+    const newSlides = [...slides, { image: '', mobileImage: '', link: '' }]
     setSlides(newSlides)
     setFormData({ ...formData, content: { ...formData.content, slides: newSlides } })
   }
@@ -217,13 +225,13 @@ function HeroFields({ formData, setFormData }: any) {
     setFormData({ ...formData, content: { ...formData.content, slides: newSlides } })
   }
 
-  const handleImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (index: number, field: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
     const reader = new FileReader()
     reader.onloadend = () => {
-      updateSlide(index, 'image', reader.result as string)
+      updateSlide(index, field, reader.result as string)
     }
     reader.readAsDataURL(file)
   }
@@ -239,7 +247,7 @@ function HeroFields({ formData, setFormData }: any) {
       </div>
 
       {slides.map((slide: any, index: number) => (
-        <div key={index} className="border-2 border-gray-200 rounded-xl p-4 space-y-3 bg-gray-50">
+        <div key={index} className="border-2 border-gray-200 rounded-xl p-4 space-y-4 bg-gray-50">
           <div className="flex items-center justify-between mb-3">
             <span className="font-bold text-base text-primary-600">شريحة {index + 1}</span>
             {slides.length > 1 && (
@@ -249,83 +257,79 @@ function HeroFields({ formData, setFormData }: any) {
             )}
           </div>
 
+          {/* صورة الكمبيوتر */}
           <div>
-            <label className="block text-xs font-bold mb-1 text-gray-700">العنوان</label>
+            <label className="block text-xs font-bold mb-2 text-gray-700">
+              🖥️ صورة الكمبيوتر <span className="text-red-500">*</span>
+            </label>
+            <label className="cursor-pointer block">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-primary-500 transition text-center bg-white">
+                {slide.image ? (
+                  <div className="space-y-2">
+                    <img src={slide.image} alt="Desktop Preview" className="max-h-32 mx-auto rounded-lg object-cover" />
+                    <p className="text-xs text-primary-600 font-bold">اضغط لتغيير الصورة</p>
+                  </div>
+                ) : (
+                  <>
+                    <FiUpload className="mx-auto mb-2 text-gray-400" size={24} />
+                    <p className="text-xs text-gray-600 font-bold">صورة للشاشات الكبيرة</p>
+                    <p className="text-xs text-gray-500">مقاس مقترح: 1920x600</p>
+                  </>
+                )}
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageUpload(index, 'image', e)}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          {/* صورة الجوال */}
+          <div>
+            <label className="block text-xs font-bold mb-2 text-gray-700">
+              📱 صورة الجوال <span className="text-gray-400 font-normal">(اختياري)</span>
+            </label>
+            <label className="cursor-pointer block">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-primary-500 transition text-center bg-white">
+                {slide.mobileImage ? (
+                  <div className="space-y-2">
+                    <img src={slide.mobileImage} alt="Mobile Preview" className="max-h-32 mx-auto rounded-lg object-cover" />
+                    <p className="text-xs text-primary-600 font-bold">اضغط لتغيير الصورة</p>
+                  </div>
+                ) : (
+                  <>
+                    <FiUpload className="mx-auto mb-2 text-gray-400" size={24} />
+                    <p className="text-xs text-gray-600 font-bold">صورة للجوالات</p>
+                    <p className="text-xs text-gray-500">مقاس مقترح: 800x1000</p>
+                    <p className="text-xs text-gray-400 mt-1">إذا تركتها فارغة، ستظهر صورة الكمبيوتر</p>
+                  </>
+                )}
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageUpload(index, 'mobileImage', e)}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          {/* الرابط */}
+          <div>
+            <label className="block text-xs font-bold mb-1 text-gray-700">
+              🔗 الرابط (عند الضغط على الصورة) <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
-              value={slide.title}
-              onChange={(e) => updateSlide(index, 'title', e.target.value)}
+              value={slide.link}
+              onChange={(e) => updateSlide(index, 'link', e.target.value)}
               className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
-              placeholder="مثال: إكسسوارات أصلية"
+              placeholder="/products أو /products?category=phones"
+              required
             />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold mb-1 text-gray-700">العنوان الفرعي</label>
-            <input
-              type="text"
-              value={slide.subtitle}
-              onChange={(e) => updateSlide(index, 'subtitle', e.target.value)}
-              className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
-              placeholder="مثال: أحدث تشكيلة"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold mb-1 text-gray-700">الوصف</label>
-            <textarea
-              value={slide.description}
-              onChange={(e) => updateSlide(index, 'description', e.target.value)}
-              className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
-              placeholder="مثال: شواحن سريعة، سماعات، وحافظات عالية الجودة"
-              rows={2}
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold mb-2 text-gray-700">الصورة</label>
-            <div className="flex items-center gap-3">
-              <label className="flex-1 cursor-pointer">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-primary-500 transition text-center">
-                  <FiUpload className="mx-auto mb-2 text-gray-400" size={24} />
-                  <span className="text-sm text-gray-600">اضغط لرفع صورة</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(index, e)}
-                    className="hidden"
-                  />
-                </div>
-              </label>
-              {slide.image && (
-                <div className="w-24 h-24 rounded-lg overflow-hidden border-2 border-gray-200">
-                  <img src={slide.image} alt="Preview" className="w-full h-full object-cover" />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-bold mb-1 text-gray-700">نص الزر</label>
-              <input
-                type="text"
-                value={slide.buttonText}
-                onChange={(e) => updateSlide(index, 'buttonText', e.target.value)}
-                className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
-                placeholder="تسوق الآن"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1 text-gray-700">رابط الزر</label>
-              <input
-                type="text"
-                value={slide.buttonLink}
-                onChange={(e) => updateSlide(index, 'buttonLink', e.target.value)}
-                className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
-                placeholder="/products"
-              />
-            </div>
+            <p className="text-xs text-gray-500 mt-1">💡 الصورة كاملة قابلة للضغط وتوديك للرابط مباشرة</p>
           </div>
         </div>
       ))}
@@ -498,21 +502,24 @@ function ProductsFields({ formData, setFormData, products }: any) {
 function BannerFields({ formData, setFormData, onImageUpload }: any) {
   return (
     <div className="space-y-4">
+      {/* صورة الكمبيوتر */}
       <div>
-        <label className="block text-sm font-bold mb-2 text-gray-700">صورة البنر</label>
+        <label className="block text-sm font-bold mb-2 text-gray-700">
+          🖥️ صورة الكمبيوتر <span className="text-red-500">*</span>
+        </label>
+        
         <label className="cursor-pointer block">
           <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 hover:border-primary-500 transition text-center bg-gray-50">
             {formData.content.image ? (
               <div className="space-y-3">
-                <img src={formData.content.image} alt="Preview" className="max-h-48 mx-auto rounded-lg object-cover" />
+                <img src={formData.content.image} alt="Desktop Preview" className="max-h-48 mx-auto rounded-lg object-cover" />
                 <p className="text-sm text-primary-600 font-bold">اضغط لتغيير الصورة</p>
               </div>
             ) : (
               <>
                 <FiUpload className="mx-auto mb-3 text-gray-400" size={32} />
-                <p className="text-sm text-gray-600 font-bold mb-1">اضغط لرفع صورة البنر</p>
-                <p className="text-xs text-gray-500 mb-3">PNG, JPG, WebP (حتى 5MB)</p>
-                <ImageUploadGuide type="banner" />
+                <p className="text-sm text-gray-600 font-bold mb-1">صورة للشاشات الكبيرة</p>
+                <p className="text-xs text-gray-500">مقاس مقترح: 1920x400 | PNG, JPG, WebP</p>
               </>
             )}
           </div>
@@ -525,31 +532,71 @@ function BannerFields({ formData, setFormData, onImageUpload }: any) {
         </label>
       </div>
 
+      {/* صورة الجوال */}
+      <div>
+        <label className="block text-sm font-bold mb-2 text-gray-700">
+          📱 صورة الجوال <span className="text-gray-400 font-normal">(اختياري)</span>
+        </label>
+        
+        <label className="cursor-pointer block">
+          <div className="border-2 border-dashed border-purple-300 rounded-xl p-8 hover:border-purple-500 transition text-center bg-purple-50">
+            {formData.content.mobileImage ? (
+              <div className="space-y-3">
+                <img src={formData.content.mobileImage} alt="Mobile Preview" className="max-h-48 mx-auto rounded-lg object-cover" />
+                <p className="text-sm text-purple-600 font-bold">اضغط لتغيير الصورة</p>
+              </div>
+            ) : (
+              <>
+                <FiUpload className="mx-auto mb-3 text-purple-400" size={32} />
+                <p className="text-sm text-purple-600 font-bold mb-1">صورة للجوالات</p>
+                <p className="text-xs text-purple-500">مقاس مقترح: 800x600 | PNG, JPG, WebP</p>
+                <p className="text-xs text-gray-500 mt-2">💡 إذا تركتها فارغة، ستظهر صورة الكمبيوتر</p>
+              </>
+            )}
+          </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => onImageUpload(e, 'mobileImage')}
+            className="hidden"
+          />
+        </label>
+      </div>
+
       {/* Responsive Preview */}
       {formData.content.image && (
         <ResponsiveImagePreview imageUrl={formData.content.image} alt="معاينة البنر" />
       )}
 
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="block text-xs font-bold mb-1 text-gray-700">نص الزر</label>
-          <input
-            type="text"
-            value={formData.content.buttonText || ''}
-            onChange={(e) => setFormData({ ...formData, content: { ...formData.content, buttonText: e.target.value } })}
-            className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
-            placeholder="تسوق الآن"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-bold mb-1 text-gray-700">رابط الزر</label>
-          <input
-            type="text"
-            value={formData.content.buttonLink || ''}
-            onChange={(e) => setFormData({ ...formData, content: { ...formData.content, buttonLink: e.target.value } })}
-            className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
-            placeholder="/products"
-          />
+      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <p className="text-xs text-gray-600 mb-3">
+          💡 <strong>اختياري:</strong> يمكنك إضافة زر على البنر أو تركه فارغاً
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold mb-1 text-gray-700">
+              نص الزر <span className="text-gray-400 font-normal">(اختياري)</span>
+            </label>
+            <input
+              type="text"
+              value={formData.content.buttonText || ''}
+              onChange={(e) => setFormData({ ...formData, content: { ...formData.content, buttonText: e.target.value } })}
+              className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+              placeholder="تسوق الآن"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-1 text-gray-700">
+              رابط الزر <span className="text-gray-400 font-normal">(اختياري)</span>
+            </label>
+            <input
+              type="text"
+              value={formData.content.buttonLink || ''}
+              onChange={(e) => setFormData({ ...formData, content: { ...formData.content, buttonLink: e.target.value } })}
+              className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+              placeholder="/products"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -665,6 +712,71 @@ function ImageGridFields({ formData, setFormData, onImageUpload }: any) {
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+
+// Exclusive Offers Fields
+function ExclusiveOffersFields() {
+  return (
+    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border-2 border-purple-200">
+      <div className="text-center space-y-3">
+        <div className="text-5xl">🎁</div>
+        <h3 className="text-xl font-bold text-gray-900">قسم العروض الحصرية</h3>
+        <p className="text-gray-600 text-sm">
+          هذا القسم يعرض 3 بطاقات عروض ثابتة بتصميم جاهز
+        </p>
+        <div className="bg-white rounded-lg p-4 text-right space-y-2 text-sm">
+          <div className="flex items-start gap-2">
+            <span className="text-blue-500">💎</span>
+            <span className="text-gray-700">عرض محدود - خصم 30%</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-purple-500">🎁</span>
+            <span className="text-gray-700">هدية مجانية - اشتر 2 واحصل على 1</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-orange-500">⚡</span>
+            <span className="text-gray-700">عروض الجمعة البيضاء - خصم يصل إلى 50%</span>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500">
+          💡 لا يحتاج إلى إعدادات إضافية، فقط قم بتفعيله
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// Deals Fields
+function DealsFields() {
+  return (
+    <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border-2 border-orange-200">
+      <div className="text-center space-y-3">
+        <div className="text-5xl">🔥</div>
+        <h3 className="text-xl font-bold text-gray-900">قسم العروض الأسبوعية</h3>
+        <p className="text-gray-600 text-sm">
+          هذا القسم يعرض المنتجات التي عليها عروض تلقائياً
+        </p>
+        <div className="bg-white rounded-lg p-4 text-right space-y-2 text-sm">
+          <div className="flex items-start gap-2">
+            <span className="text-green-500">✅</span>
+            <span className="text-gray-700">يعرض المنتجات التي لها سعر عرض</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-blue-500">🏷️</span>
+            <span className="text-gray-700">يحسب نسبة الخصم تلقائياً</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-purple-500">⏰</span>
+            <span className="text-gray-700">يعرض العد التنازلي للعرض</span>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500">
+          💡 لا يحتاج إلى إعدادات إضافية، فقط قم بتفعيله
+        </p>
+      </div>
     </div>
   )
 }

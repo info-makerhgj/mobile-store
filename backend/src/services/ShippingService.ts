@@ -74,6 +74,38 @@ export class ShippingService {
     }
   }
 
+  async updateProviderPrices(providerId: string, price?: number, days?: number): Promise<void> {
+    const client = new MongoClient(mongoUrl);
+    try {
+      await client.connect();
+      const db = client.db();
+      
+      const updateData: any = { updatedAt: new Date() };
+      if (price !== undefined) updateData.price = price;
+      if (days !== undefined) updateData.estimatedDays = days;
+      
+      // تحديث جميع أسعار المدن لهذه الشركة
+      await db.collection('shipping_rates').updateMany(
+        { providerId: new ObjectId(providerId) },
+        { $set: updateData }
+      );
+      
+      // تحديث السعر الافتراضي في معلومات الشركة
+      const providerUpdate: any = { updatedAt: new Date() };
+      if (price !== undefined) providerUpdate.defaultPrice = price;
+      if (days !== undefined) providerUpdate.defaultDays = days;
+      
+      await db.collection('shipping_providers').updateOne(
+        { _id: new ObjectId(providerId) },
+        { $set: providerUpdate }
+      );
+      
+      console.log(`✅ تم تحديث أسعار جميع المدن للشركة ${providerId}`);
+    } finally {
+      await client.close();
+    }
+  }
+
   async createShipment(request: ShipmentRequest): Promise<ShipmentResponse> {
     const provider = await this.getProvider(request.providerId);
     
@@ -230,13 +262,17 @@ export class ShippingService {
     try {
       await client.connect();
       const db = client.db();
+      
+      // البحث عن أسعار المدينة المحددة
       rates = await db.collection('shipping_rates').find({ city }).toArray();
     } finally {
       await client.close();
     }
 
+    // جلب الشركات المفعلة فقط
     const providers = await this.getEnabledProviders();
     
+    // تصفية الأسعار للشركات المفعلة فقط
     return rates
       .filter((rate: any) => providers.some(p => p.id === rate.providerId.toString()))
       .map((rate: any) => {

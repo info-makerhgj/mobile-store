@@ -8,6 +8,7 @@ export default function DealsSection() {
   const [deals, setDeals] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [settings, setSettings] = useState({
+    enabled: true,
     title: 'عروض حصرية',
     subtitle: 'خصومات تصل إلى {maxDiscount}% على أفضل الأجهزة',
     bannerTitle: 'عروض لفترة محدودة',
@@ -67,7 +68,8 @@ export default function DealsSection() {
     }
   }
 
-  if (loading || deals.length === 0) return null
+  // إخفاء القسم إذا كان معطل
+  if (!settings.enabled || loading || deals.length === 0) return null
 
   const maxDiscount = Math.max(...deals.map(d => 
     Math.round(((d.originalPrice - d.price) / d.originalPrice) * 100)

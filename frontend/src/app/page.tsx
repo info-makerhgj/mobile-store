@@ -11,7 +11,7 @@ import ExclusiveOffers from '@/components/home/ExclusiveOffers'
 
 interface Section {
   id: string
-  type: 'hero' | 'categories' | 'products' | 'banner' | 'text' | 'imageGrid'
+  type: 'hero' | 'categories' | 'products' | 'banner' | 'text' | 'imageGrid' | 'exclusiveOffers' | 'deals'
   title: string
   subtitle?: string
   order: number
@@ -76,6 +76,10 @@ export default function HomeDynamic() {
         return <TextSection key={section.id} section={section} />
       case 'imageGrid':
         return <ImageGridSection key={section.id} section={section} />
+      case 'exclusiveOffers':
+        return <ExclusiveOffers key={section.id} />
+      case 'deals':
+        return <DealsSection key={section.id} />
       default:
         return null
     }
@@ -100,8 +104,11 @@ export default function HomeDynamic() {
     <main className="bg-white">
       <Header />
       {sections.map((section) => renderSection(section))}
-      <ExclusiveOffers />
-      <DealsSection />
+      
+      {/* الأقسام الثابتة - تظهر دائماً إذا لم تكن موجودة في الأقسام الديناميكية */}
+      {!sections.some(s => s.type === 'exclusiveOffers') && <ExclusiveOffers />}
+      {!sections.some(s => s.type === 'deals') && <DealsSection />}
+      
       {sections.length === 0 && (
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
@@ -125,7 +132,8 @@ function HeroSection({ section }: { section: Section }) {
     subtitle: slide.subtitle,
     description: slide.description,
     image: slide.image,
-    link: slide.buttonLink || '/products',
+    mobileImage: slide.mobileImage, // صورة الجوال
+    link: slide.link || slide.buttonLink || '/products',
     buttonText: slide.buttonText || 'تسوق الآن',
     buttonStyle: 'primary' as const,
   }))
@@ -182,31 +190,50 @@ function ProductsSection({ section, products }: { section: Section; products: an
 
 // Banner Section Component
 function BannerSection({ section }: { section: Section }) {
-  const { image, buttonText, buttonLink } = section.content
+  const { image, mobileImage, buttonText, buttonLink } = section.content
 
   return (
     <section className="py-8 md:py-12 bg-white" dir="rtl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
-          href={buttonLink || '/products'}
-          className="block relative bg-gradient-to-r from-primary-600 to-purple-600 rounded-xl overflow-hidden hover:shadow-xl transition-all"
+          href={buttonLink || '#'}
+          className="block relative rounded-xl overflow-hidden hover:shadow-xl transition-all"
         >
+          {/* صورة الكمبيوتر - تظهر على الشاشات الكبيرة */}
           {image && (
-            <div className="absolute inset-0">
-              <img src={image} alt={section.title} className="w-full h-full object-cover opacity-30" />
+            <img 
+              src={image} 
+              alt={section.title} 
+              className="hidden md:block w-full h-auto object-cover" 
+            />
+          )}
+          
+          {/* صورة الجوال - تظهر على الشاشات الصغيرة */}
+          {(mobileImage || image) && (
+            <img 
+              src={mobileImage || image} 
+              alt={section.title} 
+              className="block md:hidden w-full h-auto object-cover" 
+            />
+          )}
+          {/* إذا كان هناك نص أو زر، يظهر فوق الصورة */}
+          {(section.title || section.subtitle || buttonText) && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end">
+              <div className="p-6 md:p-12 text-white w-full">
+                {section.title && (
+                  <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-3">{section.title}</h2>
+                )}
+                {section.subtitle && (
+                  <p className="text-base md:text-lg mb-4 md:mb-6">{section.subtitle}</p>
+                )}
+                {buttonText && (
+                  <span className="inline-block bg-white text-primary-600 px-5 py-2 md:px-6 md:py-2.5 rounded-full font-bold text-xs md:text-sm hover:bg-gray-100 transition-all">
+                    {buttonText}
+                  </span>
+                )}
+              </div>
             </div>
           )}
-          <div className="relative p-6 md:p-12 text-center text-white">
-            <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-3">{section.title}</h2>
-            {section.subtitle && (
-              <p className="text-base md:text-lg mb-4 md:mb-6 text-white/90">{section.subtitle}</p>
-            )}
-            {buttonText && (
-              <span className="inline-block bg-white text-primary-600 px-5 py-2 md:px-6 md:py-2.5 rounded-full font-bold text-xs md:text-sm hover:bg-gray-100 transition-all">
-                {buttonText}
-              </span>
-            )}
-          </div>
         </Link>
       </div>
     </section>

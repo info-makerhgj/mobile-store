@@ -9,6 +9,7 @@ export default function FeaturedDealsSettings() {
   const [message, setMessage] = useState('')
 
   const [settings, setSettings] = useState({
+    enabled: true, // خيار إظهار/إخفاء القسم
     title: 'عروض حصرية',
     subtitle: 'خصومات تصل إلى {maxDiscount}% على أفضل الأجهزة',
     bannerTitle: 'عروض لفترة محدودة',
@@ -18,21 +19,49 @@ export default function FeaturedDealsSettings() {
   })
 
   useEffect(() => {
-    const saved = localStorage.getItem('featuredDealsSettings')
-    if (saved) {
-      setSettings(JSON.parse(saved))
-    }
+    fetchSettings()
   }, [])
 
-  const handleSave = () => {
+  const fetchSettings = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage/featured-deals`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setSettings(data)
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error)
+    }
+  }
+
+  const handleSave = async () => {
     setSaving(true)
     setMessage('')
 
     try {
-      localStorage.setItem('featuredDealsSettings', JSON.stringify(settings))
-      setMessage('✅ تم حفظ الإعدادات بنجاح!')
-      setTimeout(() => setMessage(''), 3000)
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage/featured-deals`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(settings),
+      })
+
+      if (response.ok) {
+        setMessage('✅ تم حفظ الإعدادات بنجاح!')
+        setTimeout(() => setMessage(''), 3000)
+      } else {
+        setMessage('❌ حدث خطأ أثناء الحفظ')
+      }
     } catch (error) {
+      console.error('Error saving settings:', error)
       setMessage('❌ حدث خطأ أثناء الحفظ')
     } finally {
       setSaving(false)
@@ -42,6 +71,7 @@ export default function FeaturedDealsSettings() {
   const handleReset = () => {
     if (confirm('هل تريد استعادة القيم الافتراضية؟')) {
       setSettings({
+        enabled: true,
         title: 'عروض حصرية',
         subtitle: 'خصومات تصل إلى {maxDiscount}% على أفضل الأجهزة',
         bannerTitle: 'عروض لفترة محدودة',
@@ -142,8 +172,32 @@ export default function FeaturedDealsSettings() {
 
         {/* Settings Form */}
         <div className="space-y-6">
-          {/* Header Settings */}
+          {/* Enable/Disable Section */}
           <div className="admin-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold mb-2">🔌 حالة القسم</h3>
+                <p className="text-sm text-gray-600">
+                  {settings.enabled ? '✅ القسم نشط ويظهر في الصفحة الرئيسية' : '❌ القسم مخفي ولا يظهر في الصفحة الرئيسية'}
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={settings.enabled}
+                  onChange={(e) => setSettings({...settings, enabled: e.target.checked})}
+                  className="sr-only peer"
+                />
+                <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:right-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary-600"></div>
+                <span className="mr-3 text-sm font-bold text-gray-900">
+                  {settings.enabled ? 'مفعّل' : 'معطّل'}
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Header Settings */}
+          <div className={`admin-card ${!settings.enabled ? 'opacity-50' : ''}`}>
             <h3 className="text-xl font-bold mb-4">⚙️ إعدادات العنوان</h3>
             
             <div className="space-y-4">
@@ -177,7 +231,7 @@ export default function FeaturedDealsSettings() {
           </div>
 
           {/* Banner Settings */}
-          <div className="admin-card">
+          <div className={`admin-card ${!settings.enabled ? 'opacity-50' : ''}`}>
             <h3 className="text-xl font-bold mb-4">🎨 إعدادات البنر</h3>
             
             <div className="space-y-4">
@@ -206,7 +260,7 @@ export default function FeaturedDealsSettings() {
           </div>
 
           {/* Display Settings */}
-          <div className="admin-card">
+          <div className={`admin-card ${!settings.enabled ? 'opacity-50' : ''}`}>
             <h3 className="text-xl font-bold mb-4">📊 إعدادات العرض</h3>
             
             <div className="space-y-4">

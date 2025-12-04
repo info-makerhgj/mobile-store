@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import ProductsGrid from '@/components/products/ProductsGrid'
 import ProductFilters from '@/components/products/ProductFilters'
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams()
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000])
   const [selectedConditions, setSelectedConditions] = useState<string[]>([])
@@ -14,7 +16,12 @@ export default function ProductsPage() {
 
   useEffect(() => {
     setMounted(true)
-  }, [])
+    // Read category from URL
+    const categoryFromUrl = searchParams.get('category')
+    if (categoryFromUrl) {
+      setSelectedCategory(categoryFromUrl)
+    }
+  }, [searchParams])
 
   if (!mounted) {
     return (

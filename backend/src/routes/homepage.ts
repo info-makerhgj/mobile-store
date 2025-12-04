@@ -10,6 +10,8 @@ import {
   toggleSection,
   getFeaturedDealsSettings,
   updateFeaturedDealsSettings,
+  getExclusiveOffersSettings,
+  updateExclusiveOffersSettings,
 } from '../controllers/homepageController'
 import { authenticate, authorize } from '../middleware/auth'
 
@@ -21,6 +23,10 @@ router.get('/', getHomepageConfig)
 // Featured Deals Settings
 router.get('/featured-deals', getFeaturedDealsSettings)
 router.put('/featured-deals', authenticate, authorize(['admin']), updateFeaturedDealsSettings)
+
+// Exclusive Offers Settings
+router.get('/exclusive-offers', getExclusiveOffersSettings)
+router.put('/exclusive-offers', authenticate, authorize(['admin']), updateExclusiveOffersSettings)
 
 // Admin routes - manage homepage
 router.put('/', authenticate, authorize(['admin']), updateHomepageConfig)

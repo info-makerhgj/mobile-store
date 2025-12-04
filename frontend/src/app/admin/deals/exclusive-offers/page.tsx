@@ -8,6 +8,7 @@ export default function ExclusiveOffersSettings() {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [enabled, setEnabled] = useState(true) // خيار إظهار/إخفاء القسم
 
   // بيانات العروض الثلاثة
   const [offer1, setOffer1] = useState({
@@ -42,14 +43,26 @@ export default function ExclusiveOffersSettings() {
     setMessage('')
 
     try {
-      // حفظ البيانات في localStorage مؤقتاً
-      const offersData = { offer1, offer2, offer3 }
-      localStorage.setItem('exclusiveOffers', JSON.stringify(offersData))
+      const token = localStorage.getItem('token')
+      const offersData = { enabled, offer1, offer2, offer3 }
       
-      setMessage('✅ تم حفظ العروض بنجاح!')
-      
-      setTimeout(() => setMessage(''), 3000)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage/exclusive-offers`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(offersData),
+      })
+
+      if (response.ok) {
+        setMessage('✅ تم حفظ العروض بنجاح!')
+        setTimeout(() => setMessage(''), 3000)
+      } else {
+        setMessage('❌ حدث خطأ أثناء الحفظ')
+      }
     } catch (error) {
+      console.error('Error saving offers:', error)
       setMessage('❌ حدث خطأ أثناء الحفظ')
     } finally {
       setSaving(false)
@@ -58,6 +71,7 @@ export default function ExclusiveOffersSettings() {
 
   const handleReset = () => {
     if (confirm('هل تريد استعادة القيم الافتراضية؟')) {
+      setEnabled(true)
       setOffer1({
         title: 'عرض الجمعة البيضاء',
         titleEn: 'Black Friday Deal',
@@ -86,15 +100,28 @@ export default function ExclusiveOffersSettings() {
   }
 
   useEffect(() => {
-    // تحميل البيانات المحفوظة
-    const saved = localStorage.getItem('exclusiveOffers')
-    if (saved) {
-      const data = JSON.parse(saved)
-      if (data.offer1) setOffer1(data.offer1)
-      if (data.offer2) setOffer2(data.offer2)
-      if (data.offer3) setOffer3(data.offer3)
-    }
+    fetchSettings()
   }, [])
+
+  const fetchSettings = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage/exclusive-offers`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (response.ok) {
+        const data = await response.json()
+        if (data.enabled !== undefined) setEnabled(data.enabled)
+        if (data.offer1) setOffer1(data.offer1)
+        if (data.offer2) setOffer2(data.offer2)
+        if (data.offer3) setOffer3(data.offer3)
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error)
+    }
+  }
 
   return (
     <AdminLayout>
@@ -172,8 +199,32 @@ export default function ExclusiveOffersSettings() {
 
         {/* Forms */}
         <div className="space-y-6">
-          {/* العرض الأول */}
+          {/* Enable/Disable Section */}
           <div className="admin-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold mb-2">🔌 حالة القسم</h3>
+                <p className="text-sm text-gray-600">
+                  {enabled ? '✅ القسم نشط ويظهر في الصفحة الرئيسية' : '❌ القسم مخفي ولا يظهر في الصفحة الرئيسية'}
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={enabled}
+                  onChange={(e) => setEnabled(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:right-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary-600"></div>
+                <span className="mr-3 text-sm font-bold text-gray-900">
+                  {enabled ? 'مفعّل' : 'معطّل'}
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* العرض الأول */}
+          <div className={`admin-card ${!enabled ? 'opacity-50' : ''}`}>
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
               <span className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg"></span>
               العرض الأول (برتقالي)
@@ -249,7 +300,7 @@ export default function ExclusiveOffersSettings() {
           </div>
 
           {/* العرض الثاني */}
-          <div className="admin-card">
+          <div className={`admin-card ${!enabled ? 'opacity-50' : ''}`}>
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
               <span className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg"></span>
               العرض الثاني (بنفسجي)
@@ -319,7 +370,7 @@ export default function ExclusiveOffersSettings() {
           </div>
 
           {/* العرض الثالث */}
-          <div className="admin-card">
+          <div className={`admin-card ${!enabled ? 'opacity-50' : ''}`}>
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
               <span className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg"></span>
               العرض الثالث (أزرق)

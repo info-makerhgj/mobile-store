@@ -6,14 +6,32 @@ import { FiClock, FiZap, FiGift } from 'react-icons/fi'
 
 export default function ExclusiveOffers() {
   const [offersData, setOffersData] = useState<any>(null)
+  const [enabled, setEnabled] = useState(true)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // قراءة البيانات من localStorage
-    const saved = localStorage.getItem('exclusiveOffers')
-    if (saved) {
-      setOffersData(JSON.parse(saved))
-    }
+    fetchSettings()
   }, [])
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage/exclusive-offers`)
+      if (response.ok) {
+        const data = await response.json()
+        setOffersData(data)
+        if (data.enabled !== undefined) {
+          setEnabled(data.enabled)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // إخفاء القسم إذا كان معطل أو لا يزال يحمل
+  if (loading || !enabled) return null
 
   const offers = [
     {

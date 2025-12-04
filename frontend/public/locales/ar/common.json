@@ -1,0 +1,61 @@
+{
+  "header": {
+    "home": "الرئيسية",
+    "allProducts": "جميع المنتجات",
+    "smartphones": "الجوالات",
+    "tablets": "الأجهزة اللوحية",
+    "smartwatches": "الساعات الذكية",
+    "headphones": "السماعات",
+    "deals": "العروض",
+    "search": "ابحث عن جوال، إكسسوار...",
+    "tagline": "أبعاد جديدة للتواصل التقني"
+  },
+  "login": {
+    "welcome": "أهلاً بك",
+    "welcomeBack": "سجل دخولك للمتابعة",
+    "createAccount": "حساب جديد",
+    "createAccountDesc": "انضم إلينا واستمتع بالتسوق",
+    "loginTab": "تسجيل الدخول",
+    "registerTab": "حساب جديد",
+    "fullName": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الجوال",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "agreeTerms": "أوافق على",
+    "terms": "الشروط والأحكام",
+    "and": "و",
+    "privacy": "سياسة الخصوصية",
+    "loginButton": "تسجيل الدخول",
+    "registerButton": "إنشاء حساب",
+    "loading": "جاري التحميل...",
+    "or": "أو",
+    "continueGoogle": "متابعة مع Google",
+    "continueFacebook": "متابعة مع Facebook",
+    "freeShipping": "شحن مجاني",
+    "securePayment": "دفع آمن",
+    "originalProducts": "منتجات أصلية",
+    "enterFullName": "أدخل اسمك الكامل",
+    "enterEmail": "example@email.com",
+    "enterPhone": "+966 50 123 4567"
+  },
+  "footer": {
+    "aboutUs": "من نحن",
+    "contactUs": "اتصل بنا",
+    "terms": "الشروط والأحكام",
+    "privacy": "سياسة الخصوصية",
+    "returnPolicy": "سياسة الاسترجاع",
+    "warranty": "الضمان",
+    "allRightsReserved": "جميع الحقوق محفوظة"
+  },
+  "common": {
+    "addToCart": "أضف للسلة",
+    "buyNow": "اشتر الآن",
+    "sar": "ر.س",
+    "viewDetails": "عرض التفاصيل",
+    "outOfStock": "غير متوفر",
+    "inStock": "متوفر"
+  }
+}

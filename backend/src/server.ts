@@ -14,6 +14,7 @@ import addressRoutes from './routes/addresses' // ✅ إدارة العناوي�
 import customersRoutes from './routes/customers' // ✅ إدارة العملاء
 import distributionRoutes from './routes/distribution' // ✅ نظام التوزيع
 import pagesRoutes from './routes/pages' // ✅ إدارة الصفحات
+import categoryRoutes from './routes/categories' // ✅ إدارة الفئات
 import { errorHandler } from './middleware/errorHandler'
 
 dotenv.config()
@@ -49,6 +50,8 @@ app.use('/api/addresses', addressRoutes) // ✅ إدارة العناوين
 app.use('/api/customers', customersRoutes) // ✅ إدارة العملاء
 app.use('/api/distribution', distributionRoutes) // ✅ نظام التوزيع
 app.use('/api/pages', pagesRoutes) // ✅ إدارة الصفحات
+app.use('/api/categories', categoryRoutes) // ✅ إدارة الفئات
+app.use('/api/setup', require('./routes/setup').default) // ✅ Setup route
 
 app.use(errorHandler)
 
