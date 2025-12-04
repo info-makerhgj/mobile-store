@@ -1,0 +1,96 @@
+// Homepage Configuration Schema - Dynamic Sections System
+// Shopify-like flexible page builder
+
+model HomepageConfig {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Dynamic Sections - can be reordered and repeated
+  sections Section[]
+}
+
+// Universal Section Type - supports all content types
+type Section {
+  id       String
+  type     String  // "hero", "categories", "products", "banner", "text", "image-grid", "custom"
+  title    String?
+  subtitle String?
+  order    Int
+  active   Boolean
+  settings Json    // Flexible settings for each section type
+  content  Json    // Flexible content structure
+}
+
+// Section Types Examples:
+// 
+// 1. Hero Banner:
+// {
+//   type: "hero",
+//   title: "عروض خاصة",
+//   settings: { autoplay: true, interval: 5000 },
+//   content: {
+//     slides: [
+//       { title: "...", subtitle: "...", image: "...", buttonText: "...", buttonLink: "..." }
+//     ]
+//   }
+// }
+//
+// 2. Categories:
+// {
+//   type: "categories",
+//   title: "تسوق حسب الفئة",
+//   settings: { columns: 4, showIcons: true },
+//   content: {
+//     items: [
+//       { name: "هواتف", icon: "📱", link: "/products?cat=phones" }
+//     ]
+//   }
+// }
+//
+// 3. Products:
+// {
+//   type: "products",
+//   title: "المنتجات المميزة",
+//   settings: { displayType: "grid", limit: 8, columns: 4 },
+//   content: {
+//     productIds: ["id1", "id2", ...],
+//     source: "manual" | "featured" | "latest" | "bestseller"
+//   }
+// }
+//
+// 4. Banner:
+// {
+//   type: "banner",
+//   settings: { fullWidth: true, height: "medium" },
+//   content: {
+//     image: "...",
+//     title: "...",
+//     buttonText: "...",
+//     buttonLink: "..."
+//   }
+// }
+//
+// 5. Text:
+// {
+//   type: "text",
+//   title: "عن المتجر",
+//   settings: { align: "center", maxWidth: "lg" },
+//   content: {
+//     text: "نص طويل...",
+//     html: "<p>...</p>"
+//   }
+// }
+//
+// 6. Image Grid:
+// {
+//   type: "image-grid",
+//   title: "العلامات التجارية",
+//   settings: { columns: 6, gap: "md" },
+//   content: {
+//     images: [
+//       { url: "...", link: "...", alt: "..." }
+//     ]
+//   }
+// }

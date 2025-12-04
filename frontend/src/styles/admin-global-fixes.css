@@ -1,0 +1,240 @@
+/* ============================================
+   🔧 إصلاحات عامة لجميع صفحات الأدمن
+   ============================================ */
+
+/* إصلاح الأزرار في جميع الصفحات */
+button[class*="bg-primary"]:not(.admin-btn),
+button[class*="bg-blue"]:not(.admin-btn),
+button[class*="bg-green"]:not(.admin-btn),
+button[class*="bg-red"]:not(.admin-btn),
+a[class*="bg-primary"]:not(.admin-btn),
+a[class*="bg-blue"]:not(.admin-btn),
+a[class*="bg-green"]:not(.admin-btn),
+a[class*="bg-red"]:not(.admin-btn) {
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+button[class*="bg-primary"]:not(.admin-btn):hover,
+button[class*="bg-blue"]:not(.admin-btn):hover,
+button[class*="bg-green"]:not(.admin-btn):hover,
+a[class*="bg-primary"]:not(.admin-btn):hover,
+a[class*="bg-blue"]:not(.admin-btn):hover,
+a[class*="bg-green"]:not(.admin-btn):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+}
+
+/* إصلاح الحقول */
+input[type="text"]:not(.admin-search-input),
+input[type="email"]:not(.admin-search-input),
+input[type="number"]:not(.admin-search-input),
+input[type="password"]:not(.admin-search-input),
+input[type="tel"]:not(.admin-search-input),
+textarea:not(.admin-search-input),
+select:not(.admin-select) {
+  border-radius: 10px;
+  border: 2px solid #e5e7eb;
+  padding: 10px 16px;
+  transition: all 0.2s ease;
+}
+
+input:not(.admin-search-input):focus,
+textarea:not(.admin-search-input):focus,
+select:not(.admin-select):focus {
+  border-color: #9333ea;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+}
+
+/* إصلاح البطاقات */
+div[class*="bg-white"][class*="rounded"]:not(.admin-card):not(.admin-stat-card) {
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* إصلاح الشارات */
+span[class*="bg-green"]:not(.admin-badge):not(.admin-stat-value),
+span[class*="bg-red"]:not(.admin-badge):not(.admin-stat-value),
+span[class*="bg-blue"]:not(.admin-badge):not(.admin-stat-value),
+span[class*="bg-yellow"]:not(.admin-badge):not(.admin-stat-value),
+span[class*="bg-purple"]:not(.admin-badge):not(.admin-stat-value) {
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* إصلاح الجداول */
+table:not(.admin-table) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+table:not(.admin-table) thead {
+  background: #f9fafb;
+}
+
+table:not(.admin-table) th {
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 13px;
+  padding: 14px 16px;
+}
+
+table:not(.admin-table) td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+table:not(.admin-table) tbody tr:hover {
+  background: #f9fafb;
+}
+
+/* إصلاح أزرار الأيقونات */
+button[class*="p-2"]:not(.admin-btn-icon):not(.admin-btn-icon-sm),
+button[class*="p-3"]:not(.admin-btn-icon):not(.admin-btn-icon-sm) {
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+button[class*="p-2"]:not(.admin-btn-icon):not(.admin-btn-icon-sm):hover,
+button[class*="p-3"]:not(.admin-btn-icon):not(.admin-btn-icon-sm):hover {
+  transform: scale(1.05);
+}
+
+/* إصلاح الـ Modal */
+div[class*="fixed"][class*="inset-0"]:not([class*="admin-"]) {
+  backdrop-filter: blur(4px);
+}
+
+/* إصلاح العناوين */
+.admin-page h1, 
+.admin-page h2, 
+.admin-page h3 {
+  font-weight: 700;
+}
+
+/* إصلاح الـ Gradient Buttons */
+button[class*="gradient"]:not(.admin-btn),
+a[class*="gradient"]:not(.admin-btn) {
+  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+}
+
+button[class*="gradient"]:not(.admin-btn):hover,
+a[class*="gradient"]:not(.admin-btn):hover {
+  background: linear-gradient(135deg, #7e22ce 0%, #6b21a8 100%);
+}
+
+/* إصلاح الـ Alerts */
+div[class*="bg-red-50"]:not(.admin-alert),
+div[class*="bg-green-50"]:not(.admin-alert),
+div[class*="bg-blue-50"]:not(.admin-alert),
+div[class*="bg-yellow-50"]:not(.admin-alert) {
+  border-radius: 12px;
+  padding: 16px;
+  border-width: 1px;
+}
+
+/* إصلاح الـ Loading Spinner */
+div[class*="animate-spin"]:not(.admin-spinner) {
+  border-width: 3px;
+}
+
+/* إصلاح الـ Divider */
+.admin-page hr {
+  border-color: #e5e7eb;
+  opacity: 1;
+}
+
+/* إصلاح الـ Checkbox & Radio */
+.admin-page input[type="checkbox"],
+.admin-page input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+}
+
+.admin-page input[type="checkbox"]:checked,
+.admin-page input[type="radio"]:checked {
+  background-color: #9333ea;
+  border-color: #9333ea;
+}
+
+/* إصلاح الـ File Upload */
+.admin-page input[type="file"] {
+  padding: 8px;
+  border: 2px dashed #e5e7eb;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.admin-page input[type="file"]:hover {
+  border-color: #9333ea;
+  background: #faf5ff;
+}
+
+/* إصلاح الـ Tabs */
+.admin-page button[role="tab"] {
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.admin-page button[role="tab"][aria-selected="true"] {
+  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+  color: white;
+}
+
+/* إصلاح الـ Tooltip */
+.admin-page div[role="tooltip"] {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* إصلاح الـ Dropdown */
+.admin-page div[role="menu"] {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+/* إصلاح الـ Progress Bar */
+.admin-page div[role="progressbar"] {
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+/* تحسين الـ Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* إصلاح الـ Image Preview */
+.admin-page img[class*="rounded"]:not([class*="admin-"]) {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

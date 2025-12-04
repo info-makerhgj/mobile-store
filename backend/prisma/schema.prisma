@@ -1,0 +1,255 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  phone     String?  @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  orders    Order[]
+  addresses Address[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  nameAr          String
+  nameEn          String
+  tagline         String?
+  descriptionAr   String
+  descriptionEn   String
+  price           Float
+  originalPrice   Float?
+  brand           String
+  category        String
+  images          String[]
+  colors          String[]
+  storage         String[]
+  quickFeatures   Json?
+  features        Json?
+  specifications  Json
+  stock           Int
+  condition       Condition @default(NEW)
+  warranty        String
+  rating          Float    @default(0)
+  reviewsCount    Int      @default(0)
+  orderItems      OrderItem[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Order {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String      @db.ObjectId
+  user            User        @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  total           Float
+  status          OrderStatus @default(PENDING)
+  shippingAddress Json
+  paymentMethod   String
+  paymentStatus   PaymentStatus @default(PENDING)
+  paymentIntentId String?
+  transactionId   String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model PaymentIntent {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  orderId       String        @unique
+  amount        Float
+  currency      String        @default("SAR")
+  provider      String
+  status        PaymentStatus @default(PENDING)
+  paymentUrl    String?
+  transactionId String?
+  metadata      Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model PaymentSettings {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  provider  String   @unique // tap, myfatoorah, tamara, tabby, cod
+  enabled   Boolean  @default(false)
+  config    Json     // API keys and other settings
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String  @db.ObjectId
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+}
+
+model Address {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String  @db.ObjectId
+  user       User    @relation(fields: [userId], references: [id])
+  fullName   String
+  phone      String
+  city       String
+  district   String
+  street     String
+  building   String
+  postalCode String?
+  isDefault  Boolean @default(false)
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Condition {
+  NEW
+  REFURBISHED
+  USED
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+model ShippingProvider {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique // "smsa", "redbox", "aramex"
+  displayName String   // "سمسا", "ريدبكس", "أرامكس"
+  enabled     Boolean  @default(false)
+  apiKey      String?
+  apiSecret   String?
+  apiUrl      String?
+  testMode    Boolean  @default(true)
+  settings    Json?    // إعدادات إضافية خاصة بكل شركة
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("shipping_providers")
+}
+
+model ShippingRate {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  providerId String   @db.ObjectId
+  city       String   // المدينة
+  price      Float    // سعر الشحن
+  estimatedDays Int    // أيام التوصيل المتوقعة
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("shipping_rates")
+}
+
+model Shipment {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId         String   @db.ObjectId
+  providerId      String   @db.ObjectId
+  trackingNumber  String?
+  status          String   // "pending", "picked_up", "in_transit", "delivered", "failed"
+  shippingCost    Float
+  estimatedDelivery DateTime?
+  actualDelivery  DateTime?
+  apiResponse     Json?    // استجابة API الكاملة
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("shipments")
+}
+
+model StoreSettings {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  key       String   @unique // "tax_rate", "free_shipping_threshold", etc.
+  value     Json     // القيمة
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("store_settings")
+}
+
+// ============================================
+// 🏭 Distribution Management System
+// ============================================
+
+// الشحنات الواردة من المصنع
+model FactoryShipment {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  shipmentCode    String   @unique // كود الشحنة
+  model           String   // الموديل
+  color           String   // اللون
+  totalQuantity   Int      // الكمية الكلية
+  weight          Float?   // الوزن
+  factoryBoxNo    String?  // رقم الكرتون من المصنع
+  receivedDate    DateTime @default(now())
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("factory_shipments")
+}
+
+// الأجهزة (كل جهاز له IMEI)
+model Device {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  shipmentId  String   @db.ObjectId
+  imei1       String   @unique // IMEI الأول
+  imei2       String?  // IMEI الثاني (لو موجود)
+  serialNo    String?  // السيريال
+  status      DeviceStatus @default(IN_STOCK) // حالة الجهاز
+  groupId     String?  @db.ObjectId // المجموعة اللي انضاف لها
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("devices")
+}
+
+// مجموعات التوزيع للعملاء
+model DistributionGroup {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  groupCode     String   @unique // كود المجموعة (للـ QR)
+  shipmentId    String   @db.ObjectId
+  clientName    String   // اسم العميل
+  clientPhone   String?  // رقم العميل
+  model         String   // الموديل
+  color         String   // اللون
+  quantity      Int      // الكمية
+  qrCode        String?  // QR Code data
+  labelPrinted  Boolean  @default(false) // هل تم طباعة الملصق
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("distribution_groups")
+}
+
+enum DeviceStatus {
+  IN_STOCK      // في المخزون
+  ASSIGNED      // مخصص لمجموعة
+  DELIVERED     // تم التسليم
+  RETURNED      // مرتجع
+}

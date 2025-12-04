@@ -1,0 +1,45 @@
+// إضافة هذه الجداول إلى schema.prisma الرئيسي
+
+model ShippingProvider {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   // "smsa", "redbox", "aramex"
+  displayName String   // "سمسا", "ريدبكس", "أرامكس"
+  enabled     Boolean  @default(false)
+  apiKey      String?
+  apiSecret   String?
+  apiUrl      String?
+  testMode    Boolean  @default(true)
+  settings    Json?    // إعدادات إضافية خاصة بكل شركة
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("shipping_providers")
+}
+
+model ShippingRate {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  providerId String   @db.ObjectId
+  city       String   // المدينة
+  price      Float    // سعر الشحن
+  estimatedDays Int    // أيام التوصيل المتوقعة
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("shipping_rates")
+}
+
+model Shipment {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId         String   @db.ObjectId
+  providerId      String   @db.ObjectId
+  trackingNumber  String?
+  status          String   // "pending", "picked_up", "in_transit", "delivered", "failed"
+  shippingCost    Float
+  estimatedDelivery DateTime?
+  actualDelivery  DateTime?
+  apiResponse     Json?    // استجابة API الكاملة
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("shipments")
+}
