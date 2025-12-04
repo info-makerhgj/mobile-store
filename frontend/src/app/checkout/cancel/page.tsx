@@ -1,11 +1,12 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { FiXCircle } from 'react-icons/fi'
 
-export default function PaymentCancelPage() {
+function CancelContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const orderId = searchParams.get('orderId')
@@ -57,5 +58,17 @@ export default function PaymentCancelPage() {
       </main>
       <Footer />
     </>
+  )
+}
+
+export default function PaymentCancelPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    }>
+      <CancelContent />
+    </Suspense>
   )
 }
