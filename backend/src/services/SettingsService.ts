@@ -44,7 +44,7 @@ export class SettingsService {
   async getAllSettings(): Promise<any> {
     const settings = await prisma.storeSettings.findMany();
     const result: any = {};
-    settings.forEach(s => {
+    settings.forEach((s: any) => {
       result[s.key] = s.value;
     });
     return result;

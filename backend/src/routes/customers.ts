@@ -41,6 +41,7 @@ router.get('/', authenticate, authorize(['ADMIN']), async (req, res) => {
           select: {
             total: true,
             status: true,
+            createdAt: true,
           },
         },
       },
@@ -58,7 +59,7 @@ router.get('/', authenticate, authorize(['ADMIN']), async (req, res) => {
       
       // Consider active if they have orders in the last 90 days
       const lastOrderDate = customer.orders.length > 0 
-        ? new Date(Math.max(...customer.orders.map(o => new Date(o.status).getTime())))
+        ? new Date(Math.max(...customer.orders.map(o => new Date(o.createdAt).getTime())))
         : null;
       const isActive = lastOrderDate 
         ? (Date.now() - lastOrderDate.getTime()) < 90 * 24 * 60 * 60 * 1000
