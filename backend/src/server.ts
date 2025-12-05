@@ -23,8 +23,20 @@ const app = express()
 const PORT = Number(process.env.PORT) || 4000
 
 // CORS Configuration for Production
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://mobile-store-frontend-nu.vercel.app',
+  process.env.FRONTEND_URL
+].filter(Boolean)
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || '*',
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 }
