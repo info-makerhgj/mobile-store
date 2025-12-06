@@ -1,76 +1,55 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { MongoClient, ObjectId } from 'mongodb';
 import { authenticate, authorize } from '../middleware/auth';
 
 const router = Router();
-const prisma = new PrismaClient();
+const MONGODB_URI = process.env.DATABASE_URL || 'mongodb://localhost:27017/mobile_store';
 
 // Get all customers (Admin only)
 router.get('/', authenticate, authorize(['ADMIN']), async (req, res) => {
+  const client = new MongoClient(MONGODB_URI);
+  
   try {
+    await client.connect();
+    const db = client.db();
     const { search, status } = req.query;
 
-    const where: any = {
+    const query: any = {
       role: 'USER', // Only get customers, not admins
     };
 
     // Search by name, email, or phone
     if (search) {
-      where.OR = [
-        { name: { contains: search as string, mode: 'insensitive' } },
-        { email: { contains: search as string, mode: 'insensitive' } },
-        { phone: { contains: search as string, mode: 'insensitive' } },
+      query.$or = [
+        { name: { $regex: search as string, $options: 'i' } },
+        { email: { $regex: search as string, $options: 'i' } },
+        { phone: { $regex: search as string, $options: 'i' } },
       ];
     }
 
-    const customers = await prisma.user.findMany({
-      where,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        createdAt: true,
-        updatedAt: true,
-        _count: {
-          select: {
-            orders: true,
-          },
-        },
-        orders: {
-          select: {
-            total: true,
-            status: true,
-            createdAt: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    const customers = await db.collection('users').find(query).sort({ createdAt: -1 }).toArray();
+    const orders = await db.collection('orders').find({}).toArray();
 
     // Calculate stats for each customer
-    const customersWithStats = customers.map((customer) => {
-      const totalSpent = customer.orders.reduce((sum, order) => sum + order.total, 0);
-      const completedOrders = customer.orders.filter(
-        (order) => order.status === 'DELIVERED'
-      ).length;
+    const customersWithStats = customers.map((customer: any) => {
+      const customerOrders = orders.filter((order: any) => order.userId === customer._id.toString());
+      const totalSpent = customerOrders.reduce((sum: number, order: any) => sum + (order.total || 0), 0);
+      const completedOrders = customerOrders.filter((order: any) => order.status === 'DELIVERED').length;
       
       // Consider active if they have orders in the last 90 days
-      const lastOrderDate = customer.orders.length > 0 
-        ? new Date(Math.max(...customer.orders.map(o => new Date(o.createdAt).getTime())))
+      const lastOrderDate = customerOrders.length > 0 
+        ? new Date(Math.max(...customerOrders.map((o: any) => new Date(o.createdAt).getTime())))
         : null;
       const isActive = lastOrderDate 
         ? (Date.now() - lastOrderDate.getTime()) < 90 * 24 * 60 * 60 * 1000
         : false;
 
       return {
-        id: customer.id,
+        id: customer._id.toString(),
         name: customer.name,
         email: customer.email,
         phone: customer.phone || '',
-        orders: customer._count.orders,
+        orders: customerOrders.length,
         completedOrders,
         totalSpent,
         joinDate: customer.createdAt,
@@ -81,7 +60,7 @@ router.get('/', authenticate, authorize(['ADMIN']), async (req, res) => {
 
     // Filter by status if provided
     const filteredCustomers = status && status !== 'all'
-      ? customersWithStats.filter(c => c.status === status)
+      ? customersWithStats.filter((c: any) => c.status === status)
       : customersWithStats;
 
     res.json({
@@ -91,125 +70,92 @@ router.get('/', authenticate, authorize(['ADMIN']), async (req, res) => {
   } catch (error) {
     console.error('Error fetching customers:', error);
     res.status(500).json({ error: 'Failed to fetch customers' });
+  } finally {
+    await client.close();
   }
 });
 
 // Get customer by ID (Admin only)
 router.get('/:id', authenticate, authorize(['ADMIN']), async (req, res) => {
+  const client = new MongoClient(MONGODB_URI);
+  
   try {
+    await client.connect();
+    const db = client.db();
     const { id } = req.params;
 
-    const customer = await prisma.user.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        createdAt: true,
-        updatedAt: true,
-        orders: {
-          select: {
-            id: true,
-            total: true,
-            status: true,
-            paymentStatus: true,
-            createdAt: true,
-            items: {
-              select: {
-                quantity: true,
-                price: true,
-                product: {
-                  select: {
-                    nameAr: true,
-                    nameEn: true,
-                    images: true,
-                  },
-                },
-              },
-            },
-          },
-          orderBy: {
-            createdAt: 'desc',
-          },
-        },
-        addresses: {
-          select: {
-            id: true,
-            fullName: true,
-            phone: true,
-            city: true,
-            district: true,
-            street: true,
-            building: true,
-            postalCode: true,
-            isDefault: true,
-          },
-        },
-      },
-    });
+    const customer = await db.collection('users').findOne({ _id: new ObjectId(id) });
 
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
 
-    const totalSpent = customer.orders.reduce((sum, order) => sum + order.total, 0);
-    const completedOrders = customer.orders.filter(
-      (order) => order.status === 'DELIVERED'
-    ).length;
+    const orders = await db.collection('orders').find({ userId: id }).sort({ createdAt: -1 }).toArray();
+    const addresses = await db.collection('addresses').find({ userId: id }).toArray();
+
+    const totalSpent = orders.reduce((sum: number, order: any) => sum + (order.total || 0), 0);
+    const completedOrders = orders.filter((order: any) => order.status === 'DELIVERED').length;
 
     res.json({
-      ...customer,
+      id: customer._id.toString(),
+      name: customer.name,
+      email: customer.email,
+      phone: customer.phone,
+      createdAt: customer.createdAt,
+      updatedAt: customer.updatedAt,
+      orders: orders.map((order: any) => ({
+        id: order._id.toString(),
+        total: order.total,
+        status: order.status,
+        paymentStatus: order.paymentStatus,
+        createdAt: order.createdAt,
+        items: order.items || [],
+      })),
+      addresses: addresses.map((addr: any) => ({
+        id: addr._id.toString(),
+        fullName: addr.fullName,
+        phone: addr.phone,
+        city: addr.city,
+        district: addr.district,
+        street: addr.street,
+        building: addr.building,
+        postalCode: addr.postalCode,
+        isDefault: addr.isDefault,
+      })),
       totalSpent,
       completedOrders,
     });
   } catch (error) {
     console.error('Error fetching customer:', error);
     res.status(500).json({ error: 'Failed to fetch customer' });
+  } finally {
+    await client.close();
   }
 });
 
 // Get customer stats (Admin only)
 router.get('/stats/overview', authenticate, authorize(['ADMIN']), async (req, res) => {
+  const client = new MongoClient(MONGODB_URI);
+  
   try {
-    const totalCustomers = await prisma.user.count({
-      where: { role: 'USER' },
-    });
+    await client.connect();
+    const db = client.db();
 
-    const customers = await prisma.user.findMany({
-      where: { role: 'USER' },
-      select: {
-        createdAt: true,
-        orders: {
-          select: {
-            total: true,
-            status: true,
-            createdAt: true,
-          },
-        },
-      },
-    });
+    const totalCustomers = await db.collection('users').countDocuments({ role: 'USER' });
+    const customers = await db.collection('users').find({ role: 'USER' }).toArray();
+    const orders = await db.collection('orders').find({}).toArray();
 
     // Calculate active customers (ordered in last 90 days)
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
     
-    const activeCustomers = customers.filter((customer) => {
-      return customer.orders.some(
-        (order) => new Date(order.createdAt) > ninetyDaysAgo
-      );
+    const activeCustomers = customers.filter((customer: any) => {
+      const customerOrders = orders.filter((order: any) => order.userId === customer._id.toString());
+      return customerOrders.some((order: any) => new Date(order.createdAt) > ninetyDaysAgo);
     }).length;
 
-    const totalOrders = customers.reduce(
-      (sum, customer) => sum + customer.orders.length,
-      0
-    );
-
-    const totalRevenue = customers.reduce(
-      (sum, customer) =>
-        sum + customer.orders.reduce((orderSum, order) => orderSum + order.total, 0),
-      0
-    );
+    const totalOrders = orders.length;
+    const totalRevenue = orders.reduce((sum: number, order: any) => sum + (order.total || 0), 0);
 
     res.json({
       totalCustomers,
@@ -223,6 +169,8 @@ router.get('/stats/overview', authenticate, authorize(['ADMIN']), async (req, re
   } catch (error) {
     console.error('Error fetching customer stats:', error);
     res.status(500).json({ error: 'Failed to fetch customer stats' });
+  } finally {
+    await client.close();
   }
 });
 
