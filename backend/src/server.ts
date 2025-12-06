@@ -49,6 +49,15 @@ app.get('/', (req, res) => {
   res.json({ message: 'Mobile Store API - Running ✅' })
 })
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    message: 'API is running',
+    timestamp: new Date().toISOString()
+  })
+})
+
 app.use('/api/products', productRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/orders', orderRoutes)
