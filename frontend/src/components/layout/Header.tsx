@@ -28,7 +28,8 @@ export default function Header() {
 
   // Fetch categories
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`)
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+    fetch(`${API_URL}/categories`)
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(err => console.error('Error loading categories:', err))

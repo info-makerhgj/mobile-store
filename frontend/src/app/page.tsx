@@ -34,7 +34,8 @@ export default function HomeDynamic() {
 
   const fetchHomepageConfig = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage`)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+      const response = await fetch(`${API_URL}/homepage`)
       if (response.ok) {
         const data = await response.json()
         const activeSections = (data.sections || [])
@@ -52,7 +53,8 @@ export default function HomeDynamic() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+      const response = await fetch(`${API_URL}/products`)
       if (response.ok) {
         const data = await response.json()
         const productsList = Array.isArray(data) ? data : (data.products || [])

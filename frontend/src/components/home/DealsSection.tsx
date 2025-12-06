@@ -29,7 +29,8 @@ export default function DealsSection() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage/featured-deals`)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+      const response = await fetch(`${API_URL}/homepage/featured-deals`)
       if (response.ok) {
         const data = await response.json()
         setSettings(data)
@@ -43,7 +44,8 @@ export default function DealsSection() {
 
   const fetchDeals = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+      const response = await fetch(`${API_URL}/products`)
       const data = await response.json()
       
       // التعامل مع البيانات سواء كانت array أو object

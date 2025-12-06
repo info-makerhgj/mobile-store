@@ -28,7 +28,7 @@ export default function ShippingSelector({ city, onSelect, selectedProviderId }:
   const fetchShippingOptions = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:4000/api/shipping/rates?city=${encodeURIComponent(city)}`);
+      const response = await fetch(`http://localhost:5000/api/shipping/rates?city=${encodeURIComponent(city)}`);
       const data = await response.json();
       if (data.success) {
         setOptions(data.rates);

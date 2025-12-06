@@ -22,7 +22,7 @@ export default function ContactPage() {
     setMessage('')
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       const res = await fetch(`${API_URL}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

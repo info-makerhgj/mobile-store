@@ -20,7 +20,10 @@
     "enable:tap": "ts-node enable-tap-payment.ts",
     "init:shipping": "ts-node init-shipping-direct.ts",
     "test:shipping": "ts-node test-shipping.ts",
-    "init:settings": "ts-node init-store-settings.ts"
+    "init:settings": "ts-node init-store-settings.ts",
+    "init:pages": "ts-node init-pages.ts",
+    "add:demo": "ts-node add-products-categories.ts",
+    "init:shipping": "ts-node init-shipping.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

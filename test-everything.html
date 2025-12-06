@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 فحص شامل للمتجر</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        .test-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.loading { background: #ffc107; color: white; }
+        .status.success { background: #28a745; color: white; }
+        .status.error { background: #dc3545; color: white; }
+        .details {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .summary h2 { margin-bottom: 15px; }
+        .summary-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+        }
+        button:hover { background: #5568d3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 فحص شامل للمتجر</h1>
+        
+        <button onclick="runAllTests()">▶️ ابدأ الفحص</button>
+        
+        <div id="tests"></div>
+        
+        <div id="summary" class="summary" style="display: none;">
+            <h2>📊 ملخص النتائج</h2>
+            <div class="summary-stats">
+                <div class="stat">
+                    <div class="stat-number" id="total-tests">0</div>
+                    <div class="stat-label">إجمالي الاختبارات</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="passed-tests" style="color: #28a745;">0</div>
+                    <div class="stat-label">نجح</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="failed-tests" style="color: #dc3545;">0</div>
+                    <div class="stat-label">فشل</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://api.ab-tw.com/api';
+        const FRONTEND_URL = 'https://mobile-store-frontend-fawn.vercel.app';
+        
+        const tests = [
+            {
+                name: 'اتصال Backend',
+                endpoint: `${API_URL}/health`,
+                method: 'GET'
+            },
+            {
+                name: 'تسجيل الدخول',
+                endpoint: `${API_URL}/auth/login`,
+                method: 'POST',
+                body: { email: 'admin@ab-tw.com', password: '123456' }
+            },
+            {
+                name: 'الصفحة الرئيسية',
+                endpoint: `${API_URL}/homepage`,
+                method: 'GET'
+            },
+            {
+                name: 'المنتجات',
+                endpoint: `${API_URL}/products`,
+                method: 'GET'
+            },
+            {
+                name: 'العروض',
+                endpoint: `${API_URL}/offers`,
+                method: 'GET'
+            },
+            {
+                name: 'الفئات',
+                endpoint: `${API_URL}/categories`,
+                method: 'GET'
+            },
+            {
+                name: 'إعدادات الضريبة',
+                endpoint: `${API_URL}/settings/tax`,
+                method: 'GET'
+            },
+            {
+                name: 'إعدادات الشحن',
+                endpoint: `${API_URL}/settings/shipping`,
+                method: 'GET'
+            },
+            {
+                name: 'صفحة من نحن',
+                endpoint: `${API_URL}/pages/about`,
+                method: 'GET'
+            },
+            {
+                name: 'Frontend متاح',
+                endpoint: FRONTEND_URL,
+                method: 'GET',
+                checkHtml: true
+            }
+        ];
+
+        let passed = 0;
+        let failed = 0;
+
+        async function runTest(test) {
+            const testDiv = document.createElement('div');
+            testDiv.className = 'test-section';
+            testDiv.innerHTML = `
+                <div class="test-title">
+                    ${test.name}
+                    <span class="status loading">جاري الفحص...</span>
+                </div>
+                <div class="details" id="details-${tests.indexOf(test)}"></div>
+            `;
+            document.getElementById('tests').appendChild(testDiv);
+
+            const detailsDiv = document.getElementById(`details-${tests.indexOf(test)}`);
+            const statusSpan = testDiv.querySelector('.status');
+
+            try {
+                const options = {
+                    method: test.method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+
+                if (test.body) {
+                    options.body = JSON.stringify(test.body);
+                }
+
+                const response = await fetch(test.endpoint, options);
+                
+                if (test.checkHtml) {
+                    if (response.ok) {
+                        statusSpan.textContent = '✅ نجح';
+                        statusSpan.className = 'status success';
+                        detailsDiv.textContent = `Status: ${response.status} - Frontend يعمل بشكل صحيح`;
+                        passed++;
+                    } else {
+                        throw new Error(`Status: ${response.status}`);
+                    }
+                } else {
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        statusSpan.textContent = '✅ نجح';
+                        statusSpan.className = 'status success';
+                        detailsDiv.textContent = JSON.stringify(data, null, 2);
+                        passed++;
+                    } else {
+                        throw new Error(data.message || 'فشل الطلب');
+                    }
+                }
+            } catch (error) {
+                statusSpan.textContent = '❌ فشل';
+                statusSpan.className = 'status error';
+                detailsDiv.textContent = `خطأ: ${error.message}`;
+                detailsDiv.style.color = '#dc3545';
+                failed++;
+            }
+        }
+
+        async function runAllTests() {
+            document.getElementById('tests').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+            passed = 0;
+            failed = 0;
+
+            for (const test of tests) {
+                await runTest(test);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            // Show summary
+            document.getElementById('total-tests').textContent = tests.length;
+            document.getElementById('passed-tests').textContent = passed;
+            document.getElementById('failed-tests').textContent = failed;
+            document.getElementById('summary').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

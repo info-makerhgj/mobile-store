@@ -40,7 +40,7 @@ export default function LabelPage() {
   const fetchGroup = async () => {
     try {
       const token = localStorage.getItem('token')
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       
       const response = await fetch(
         `${API_URL}/distribution/groups/${params.id}`,
@@ -76,7 +76,7 @@ export default function LabelPage() {
   const markAsPrinted = async () => {
     try {
       const token = localStorage.getItem('token')
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       
       await fetch(
         `${API_URL}/distribution/groups/${params.id}/printed`,

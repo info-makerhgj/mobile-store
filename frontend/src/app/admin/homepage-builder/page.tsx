@@ -38,7 +38,7 @@ export default function HomepageBuilderPage() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/products')
+      const res = await fetch('http://localhost:5000/api/products')
       const data = await res.json()
       const productsList = Array.isArray(data) ? data : (data.products || [])
       setProducts(productsList)
@@ -51,7 +51,7 @@ export default function HomepageBuilderPage() {
   const fetchConfig = async () => {
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch('http://localhost:4000/api/homepage', {
+      const res = await fetch('http://localhost:5000/api/homepage', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -90,7 +90,7 @@ export default function HomepageBuilderPage() {
   const reorderSections = async (sections: Section[]) => {
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch('http://localhost:4000/api/homepage/sections/reorder', {
+      const res = await fetch('http://localhost:5000/api/homepage/sections/reorder', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export default function HomepageBuilderPage() {
   const toggleSection = async (sectionId: string) => {
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch(`http://localhost:4000/api/homepage/sections/${sectionId}/toggle`, {
+      const res = await fetch(`http://localhost:5000/api/homepage/sections/${sectionId}/toggle`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -124,7 +124,7 @@ export default function HomepageBuilderPage() {
   const duplicateSection = async (sectionId: string) => {
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch(`http://localhost:4000/api/homepage/sections/${sectionId}/duplicate`, {
+      const res = await fetch(`http://localhost:5000/api/homepage/sections/${sectionId}/duplicate`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -142,7 +142,7 @@ export default function HomepageBuilderPage() {
 
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch(`http://localhost:4000/api/homepage/sections/${sectionId}`, {
+      const res = await fetch(`http://localhost:5000/api/homepage/sections/${sectionId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -399,8 +399,8 @@ export default function HomepageBuilderPage() {
             try {
               const token = localStorage.getItem('token')
               const url = editingSection
-                ? `http://localhost:4000/api/homepage/sections/${editingSection.id}`
-                : 'http://localhost:4000/api/homepage/sections'
+                ? `http://localhost:5000/api/homepage/sections/${editingSection.id}`
+                : 'http://localhost:5000/api/homepage/sections'
               const method = editingSection ? 'PUT' : 'POST'
 
               const res = await fetch(url, {

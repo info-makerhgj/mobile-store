@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار API المنتجات</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .product-card {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 20px;
+        }
+        .product-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .product-info {
+            flex: 1;
+        }
+        .product-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 24px;
+            color: #10b981;
+            font-weight: bold;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #9ca3af;
+            margin-right: 10px;
+        }
+        .product-category {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #6b7280;
+        }
+        h1 {
+            color: #1f2937;
+            text-align: center;
+        }
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛍️ اختبار API المنتجات</h1>
+    
+    <div class="stats" id="stats">
+        <div class="loading">جاري التحميل...</div>
+    </div>
+
+    <div id="products"></div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        async function loadProducts() {
+            try {
+                const response = await fetch(`${API_URL}/products`);
+                const data = await response.json();
+                
+                console.log('Products data:', data);
+                
+                const products = Array.isArray(data) ? data : (data.products || []);
+                
+                // عرض الإحصائيات
+                document.getElementById('stats').innerHTML = `
+                    <h2>📊 الإحصائيات</h2>
+                    <p><strong>عدد المنتجات:</strong> ${products.length}</p>
+                    <p><strong>API URL:</strong> ${API_URL}/products</p>
+                    <p><strong>الحالة:</strong> <span style="color: #10b981;">✅ يعمل</span></p>
+                `;
+                
+                // عرض المنتجات
+                const productsDiv = document.getElementById('products');
+                
+                if (products.length === 0) {
+                    productsDiv.innerHTML = `
+                        <div class="error">
+                            <h3>⚠️ لا توجد منتجات</h3>
+                            <p>قم بتشغيل: <code>cd backend && npm run add:demo</code></p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                productsDiv.innerHTML = products.map(product => `
+                    <div class="product-card">
+                        <img src="${product.images?.[0] || 'https://via.placeholder.com/150'}" 
+                             alt="${product.name}" 
+                             class="product-image">
+                        <div class="product-info">
+                            <div class="product-category">${product.category}</div>
+                            <div class="product-name">${product.name}</div>
+                            <p style="color: #6b7280; font-size: 14px;">${product.description}</p>
+                            <div>
+                                <span class="product-price">${product.price} ريال</span>
+                                ${product.originalPrice ? `<span class="original-price">${product.originalPrice} ريال</span>` : ''}
+                            </div>
+                            <p style="color: #6b7280; font-size: 12px; margin-top: 10px;">
+                                المخزون: ${product.stock} | التقييم: ${product.rating || 'N/A'} ⭐
+                            </p>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('stats').innerHTML = `
+                    <div class="error">
+                        <h3>❌ خطأ في الاتصال</h3>
+                        <p>${error.message}</p>
+                        <p>تأكد من تشغيل Backend على: ${API_URL}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // تحميل المنتجات عند فتح الصفحة
+        loadProducts();
+    </script>
+</body>
+</html>

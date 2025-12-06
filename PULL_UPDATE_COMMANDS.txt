@@ -1,0 +1,25 @@
+# 🚀 أوامر سحب التحديث من GitHub
+
+# 1. اذهب لمجلد المشروع
+cd ~/mobile-store
+
+# 2. اسحب آخر تحديثات
+git pull origin main
+
+# 3. اذهب لمجلد Backend
+cd backend
+
+# 4. اعمل Build للكود الجديد
+npm run build
+
+# 5. أعد تشغيل Backend
+pm2 restart backend
+
+# 6. شوف الـ logs للتأكد
+pm2 logs backend --lines 20
+
+# 7. اختبر الـ health endpoint
+curl http://localhost:4000/api/health
+
+# 8. إذا اشتغل، اختبر من الخارج
+curl https://api.ab-tw.com/api/health

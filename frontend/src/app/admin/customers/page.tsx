@@ -55,7 +55,7 @@ export default function AdminCustomers() {
       if (searchQuery) params.append('search', searchQuery)
       if (statusFilter !== 'all') params.append('status', statusFilter)
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       const response = await fetch(
         `${API_URL}/customers?${params}`,
         {
@@ -84,7 +84,7 @@ export default function AdminCustomers() {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       const response = await fetch(
         `${API_URL}/customers/stats/overview`,
         {

@@ -37,7 +37,7 @@ export default function FooterSettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/settings/footer')
+      const res = await fetch('http://localhost:5000/api/settings/footer')
       const data = await res.json()
       if (data.success) {
         setSettings(data.footer)
@@ -54,7 +54,7 @@ export default function FooterSettingsPage() {
     setMessage('')
     try {
       const token = localStorage.getItem('token')
-      const res = await fetch('http://localhost:4000/api/settings/footer', {
+      const res = await fetch('http://localhost:5000/api/settings/footer', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

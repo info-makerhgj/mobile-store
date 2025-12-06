@@ -25,7 +25,7 @@ export default function Footer() {
   const [settings, setSettings] = useState<FooterSettings | null>(null)
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/settings/footer`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/settings/footer`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {

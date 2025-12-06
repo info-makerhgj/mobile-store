@@ -44,7 +44,7 @@ export default function AddressSelector({ onSelect, selectedAddressId }: Address
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/addresses', {
+      const response = await fetch('http://localhost:5000/api/addresses', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -71,8 +71,8 @@ export default function AddressSelector({ onSelect, selectedAddressId }: Address
     try {
       const token = localStorage.getItem('token');
       const url = editingId 
-        ? `http://localhost:4000/api/addresses/${editingId}`
-        : 'http://localhost:4000/api/addresses';
+        ? `http://localhost:5000/api/addresses/${editingId}`
+        : 'http://localhost:5000/api/addresses';
       
       const response = await fetch(url, {
         method: editingId ? 'PUT' : 'POST',
@@ -103,7 +103,7 @@ export default function AddressSelector({ onSelect, selectedAddressId }: Address
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:4000/api/addresses/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/addresses/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

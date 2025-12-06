@@ -5,11 +5,11 @@ import { requireAdmin } from '../middleware/adminAuth';
 
 const router = Router();
 
-// Public routes
-router.get('/:slug', getPage);
-
-// Admin routes
+// Admin routes (يجب أن تكون قبل /:slug)
 router.get('/', authenticate, requireAdmin, getAllPages);
 router.put('/:slug', authenticate, requireAdmin, updatePage);
+
+// Public routes
+router.get('/:slug', getPage);
 
 export default router;

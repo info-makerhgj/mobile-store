@@ -65,7 +65,7 @@ export default function CheckoutPage() {
 
   const fetchTaxSettings = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/settings/tax');
+      const response = await fetch('http://localhost:5000/api/settings/tax');
       const data = await response.json();
       if (data.success && data.tax.enabled) {
         setTaxRate(data.tax.rate);
@@ -78,7 +78,7 @@ export default function CheckoutPage() {
   const fetchShippingOptions = async () => {
     try {
       const response = await fetch(
-        `http://localhost:4000/api/shipping/rates?city=${encodeURIComponent(selectedAddress.city)}`
+        `http://localhost:5000/api/shipping/rates?city=${encodeURIComponent(selectedAddress.city)}`
       );
       const data = await response.json();
       if (data.success && data.rates.length > 0) {
@@ -95,7 +95,7 @@ export default function CheckoutPage() {
 
   const fetchPaymentMethods = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/payments/methods');
+      const response = await fetch('http://localhost:5000/api/payments/methods');
       const data = await response.json();
       
       if (data.success) {
@@ -156,7 +156,7 @@ export default function CheckoutPage() {
     try {
       const token = localStorage.getItem('token');
       
-      const orderResponse = await fetch('http://localhost:4000/api/orders', {
+      const orderResponse = await fetch('http://localhost:5000/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

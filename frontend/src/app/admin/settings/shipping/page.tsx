@@ -34,7 +34,7 @@ export default function ShippingSettings() {
   const fetchProviders = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/shipping/providers', {
+      const response = await fetch('http://localhost:5000/api/shipping/providers', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -55,7 +55,7 @@ export default function ShippingSettings() {
     setMessage('');
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:4000/api/shipping/providers/${providerId}`, {
+      const response = await fetch(`http://localhost:5000/api/shipping/providers/${providerId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

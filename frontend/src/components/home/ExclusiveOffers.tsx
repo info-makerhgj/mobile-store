@@ -15,7 +15,8 @@ export default function ExclusiveOffers() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage/exclusive-offers`)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+      const response = await fetch(`${API_URL}/homepage/exclusive-offers`)
       if (response.ok) {
         const data = await response.json()
         setOffersData(data)

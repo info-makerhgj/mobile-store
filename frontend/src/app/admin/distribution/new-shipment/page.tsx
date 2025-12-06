@@ -58,7 +58,7 @@ export default function NewShipmentPage() {
 
     try {
       const token = localStorage.getItem('token')
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       
       const response = await fetch(`${API_URL}/distribution/shipments`, {
         method: 'POST',

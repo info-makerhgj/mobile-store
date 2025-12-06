@@ -33,7 +33,7 @@ export default function VerifyGroupPage() {
 
   const fetchGroup = async () => {
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       
       const response = await fetch(
         `${API_URL}/distribution/verify/${params.groupCode}`

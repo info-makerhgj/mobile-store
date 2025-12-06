@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الاتصال بالـ API</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { border-right: 4px solid #10b981; }
+        .error { border-right: 4px solid #ef4444; }
+        .pending { border-right: 4px solid #f59e0b; }
+        h1 { color: #1f2937; }
+        h3 { color: #374151; margin-top: 0; }
+        pre {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        .info {
+            background: #dbeafe;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 اختبار الاتصال بالـ API</h1>
+    
+    <div class="info">
+        <strong>📌 معلومات:</strong><br>
+        Backend: <code>http://localhost:5000</code><br>
+        Frontend: <code>http://localhost:3000</code><br>
+        API URL: <code id="api-url">جاري التحميل...</code>
+    </div>
+
+    <button onclick="runTests()">▶️ تشغيل الاختبارات</button>
+
+    <div id="results"></div>
+
+    <script>
+        // عرض API URL من المتغيرات البيئية
+        const API_URL = 'http://localhost:5000/api';
+        document.getElementById('api-url').textContent = API_URL;
+
+        async function testEndpoint(name, url) {
+            const resultDiv = document.getElementById('results');
+            const testBox = document.createElement('div');
+            testBox.className = 'test-box pending';
+            testBox.innerHTML = `<h3>${name}</h3><p>جاري الاختبار...</p>`;
+            resultDiv.appendChild(testBox);
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                testBox.className = 'test-box success';
+                testBox.innerHTML = `
+                    <h3>✅ ${name}</h3>
+                    <p><strong>الحالة:</strong> ${response.status} ${response.statusText}</p>
+                    <p><strong>الرابط:</strong> <code>${url}</code></p>
+                    <details>
+                        <summary>عرض البيانات</summary>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                testBox.className = 'test-box error';
+                testBox.innerHTML = `
+                    <h3>❌ ${name}</h3>
+                    <p><strong>خطأ:</strong> ${error.message}</p>
+                    <p><strong>الرابط:</strong> <code>${url}</code></p>
+                    <p><strong>التفاصيل:</strong> تأكد من أن Backend يعمل على المنفذ الصحيح</p>
+                `;
+            }
+        }
+
+        async function runTests() {
+            document.getElementById('results').innerHTML = '';
+            
+            await testEndpoint('اختبار الصفحة الرئيسية', `${API_URL}/homepage`);
+            await testEndpoint('اختبار المنتجات', `${API_URL}/products`);
+            await testEndpoint('اختبار الفئات', `${API_URL}/categories`);
+            await testEndpoint('اختبار Footer', `${API_URL}/settings/footer`);
+            await testEndpoint('اختبار العروض الحصرية', `${API_URL}/homepage/exclusive-offers`);
+            await testEndpoint('اختبار العروض المميزة', `${API_URL}/homepage/featured-deals`);
+        }
+
+        // تشغيل تلقائي عند فتح الصفحة
+        window.onload = () => {
+            setTimeout(runTests, 500);
+        };
+    </script>
+</body>
+</html>

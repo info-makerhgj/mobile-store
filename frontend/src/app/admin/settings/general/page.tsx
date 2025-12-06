@@ -30,7 +30,7 @@ export default function GeneralSettings() {
       const token = localStorage.getItem('token');
       
       // جلب إعدادات الضريبة
-      const taxResponse = await fetch('http://localhost:4000/api/settings/tax', {
+      const taxResponse = await fetch('http://localhost:5000/api/settings/tax', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const taxData = await taxResponse.json();
@@ -39,7 +39,7 @@ export default function GeneralSettings() {
       }
 
       // جلب إعدادات الشحن
-      const shippingResponse = await fetch('http://localhost:4000/api/settings/shipping', {
+      const shippingResponse = await fetch('http://localhost:5000/api/settings/shipping', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const shippingData = await shippingResponse.json();
@@ -58,7 +58,7 @@ export default function GeneralSettings() {
     setMessage('');
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/settings/tax', {
+      const response = await fetch('http://localhost:5000/api/settings/tax', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ export default function GeneralSettings() {
     setMessage('');
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/settings/shipping', {
+      const response = await fetch('http://localhost:5000/api/settings/shipping', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -53,7 +53,7 @@ export default function DistributionPage() {
       const token = localStorage.getItem('token')
       const headers = { Authorization: `Bearer ${token}` }
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       
       const [statsRes, shipmentsRes, groupsRes] = await Promise.all([
         fetch(`${API_URL}/distribution/stats`, { headers }),
