@@ -24,8 +24,10 @@ export default function HomeDynamic() {
   const [sections, setSections] = useState<Section[]>([])
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     fetchHomepageConfig()
     fetchProducts()
   }, [])
@@ -83,6 +85,17 @@ export default function HomeDynamic() {
       default:
         return null
     }
+  }
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return (
+      <main className="bg-white">
+        <Header />
+        <div className="min-h-screen"></div>
+        <Footer />
+      </main>
+    )
   }
 
   if (loading) {

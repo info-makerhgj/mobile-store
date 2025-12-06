@@ -29,6 +29,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return
+
     // Load cart from localStorage
     const savedCart = localStorage.getItem('cart')
     if (savedCart) {
@@ -52,7 +55,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const saveCart = (newItems: CartItem[]) => {
-    localStorage.setItem('cart', JSON.stringify(newItems))
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cart', JSON.stringify(newItems))
+    }
     setItems(newItems)
   }
 
@@ -125,7 +130,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   const clearCart = () => {
-    localStorage.removeItem('cart')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('cart')
+    }
     setItems([])
   }
 
