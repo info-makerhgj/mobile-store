@@ -9,7 +9,7 @@ export default function PrivacyPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/pages/privacy')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/pages/privacy`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {

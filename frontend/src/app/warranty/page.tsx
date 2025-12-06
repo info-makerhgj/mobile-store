@@ -9,7 +9,7 @@ export default function WarrantyPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/pages/warranty')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/pages/warranty`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {

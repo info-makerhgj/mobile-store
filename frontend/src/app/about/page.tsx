@@ -9,7 +9,8 @@ export default function AboutPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/pages/about')
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+    fetch(`${API_URL}/pages/about`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {
