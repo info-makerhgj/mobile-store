@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { MongoClient } from 'mongodb'
+import { MONGODB_URI } from '../config/database'
 
 const mongoUrl = MONGODB_URI;
 
@@ -153,3 +154,4 @@ export const deleteCategory = async (req: Request, res: Response) => {
     if (client) await client.close()
   }
 }
+

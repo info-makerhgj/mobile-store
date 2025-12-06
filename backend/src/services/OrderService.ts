@@ -3,6 +3,7 @@ import { Order, CreateOrderDTO, OrderItem } from '../types/order'
 import { calculateOrderPricing } from '../utils/calculations'
 import { validateShippingAddress, validateQuantity, normalizePhone } from '../utils/validators'
 import { ValidationError, StockError, OrderNotFoundError } from '../utils/errors'
+import { MONGODB_URI } from '../config/database'
 
 const mongoUrl = MONGODB_URI;
 

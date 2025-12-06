@@ -21,8 +21,15 @@ import { MongoClient } from 'mongodb';
 let cachedClient: MongoClient | null = null;
 
 export async function getMongoClient(): Promise<MongoClient> {
-  if (cachedClient && cachedClient.topology?.isConnected()) {
-    return cachedClient;
+  if (cachedClient) {
+    try {
+      // Test if connection is still alive
+      await cachedClient.db().admin().ping();
+      return cachedClient;
+    } catch (error) {
+      // Connection lost, create new one
+      cachedClient = null;
+    }
   }
 
   const client = new MongoClient(MONGODB_URI);

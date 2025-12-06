@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { MongoClient } from 'mongodb';
+import { MONGODB_URI } from '../config/database'
 
 const mongoUrl = MONGODB_URI;;
 
@@ -79,3 +80,4 @@ export const updatePage = async (req: Request, res: Response) => {
     await client.close();
   }
 };
+

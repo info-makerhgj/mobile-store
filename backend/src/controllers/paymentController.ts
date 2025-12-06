@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { MongoClient, ObjectId } from 'mongodb'
 import { AuthRequest } from '../middleware/auth'
 import { PaymentService } from '../services/PaymentService'
+import { MONGODB_URI } from '../config/database'
 
 const mongoUrl = MONGODB_URI;
 const paymentService = new PaymentService()
@@ -259,3 +260,4 @@ export const handleTapWebhook = async (req: Request, res: Response) => {
     })
   }
 }
+

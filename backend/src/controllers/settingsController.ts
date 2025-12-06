@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { SettingsService } from '../services/SettingsService';
 import { MongoClient } from 'mongodb';
+import { MONGODB_URI } from '../config/database'
 
 const settingsService = new SettingsService();
 const mongoUrl = MONGODB_URI;;
@@ -139,3 +140,4 @@ function getDefaultFooterSettings() {
     ]
   };
 }
+

@@ -3,6 +3,7 @@ import { ShipmentRequest, ShipmentResponse, TrackingInfo, ShippingProvider } fro
 import { SmsaService } from './shippingProviders/SmsaService';
 import { RedboxService } from './shippingProviders/RedboxService';
 import { AramexService } from './shippingProviders/AramexService';
+import { MONGODB_URI } from '../config/database'
 
 const mongoUrl = MONGODB_URI;;
 
@@ -328,3 +329,4 @@ export class ShippingService {
     }
   }
 }
+

@@ -1,6 +1,7 @@
 import { MongoClient, ObjectId } from 'mongodb'
 import { TapPaymentProvider } from './paymentProviders/TapPaymentProvider'
 import { TapPaymentProviderMock } from './paymentProviders/TapPaymentProviderMock'
+import { MONGODB_URI } from '../config/database'
 
 const mongoUrl = MONGODB_URI;
 
@@ -220,3 +221,4 @@ export class PaymentService {
     await this.verifyTapPayment(chargeId)
   }
 }
+

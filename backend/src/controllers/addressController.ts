@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { MongoClient, ObjectId } from 'mongodb';
+import { MONGODB_URI } from '../config/database'
 
 const mongoUrl = MONGODB_URI;;
 
@@ -213,3 +214,4 @@ export const setDefaultAddress = async (req: AuthRequest, res: Response) => {
     await client.close();
   }
 };
+
