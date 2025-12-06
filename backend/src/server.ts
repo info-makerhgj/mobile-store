@@ -15,6 +15,7 @@ import customersRoutes from './routes/customers' // ✅ إدارة العملا�
 import distributionRoutes from './routes/distribution' // ✅ نظام التوزيع
 import pagesRoutes from './routes/pages' // ✅ إدارة الصفحات
 import categoryRoutes from './routes/categories' // ✅ إدارة الفئات
+import offersRoutes from './routes/offers' // ✅ إدارة العروض
 import { errorHandler } from './middleware/errorHandler'
 
 dotenv.config()
@@ -31,17 +32,8 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
-    if (!origin) {
-      return callback(null, true)
-    }
-    
-    // Allow all Vercel domains
-    if (origin.includes('.vercel.app') || allowedOrigins.includes(origin)) {
-      return callback(null, true)
-    }
-    
-    callback(new Error('Not allowed by CORS'))
+    // Allow all origins temporarily for debugging
+    callback(null, true)
   },
   credentials: true,
   optionsSuccessStatus: 200
@@ -78,6 +70,7 @@ app.use('/api/customers', customersRoutes) // ✅ إدارة العملاء
 app.use('/api/distribution', distributionRoutes) // ✅ نظام التوزيع
 app.use('/api/pages', pagesRoutes) // ✅ إدارة الصفحات
 app.use('/api/categories', categoryRoutes) // ✅ إدارة الفئات
+app.use('/api/offers', offersRoutes) // ✅ إدارة العروض
 app.use('/api/setup', require('./routes/setup').default) // ✅ Setup route
 
 app.use(errorHandler)
