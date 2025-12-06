@@ -2,7 +2,7 @@ import { MongoClient, ObjectId } from 'mongodb'
 import { TapPaymentProvider } from './paymentProviders/TapPaymentProvider'
 import { TapPaymentProviderMock } from './paymentProviders/TapPaymentProviderMock'
 
-const mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/abaad_store'
+const mongoUrl = MONGODB_URI;
 
 export class PaymentService {
   /**

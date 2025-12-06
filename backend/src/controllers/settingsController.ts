@@ -3,7 +3,7 @@ import { SettingsService } from '../services/SettingsService';
 import { MongoClient } from 'mongodb';
 
 const settingsService = new SettingsService();
-const mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/mobile-store';
+const mongoUrl = MONGODB_URI;;
 
 export const getSettings = async (req: Request, res: Response) => {
   try {

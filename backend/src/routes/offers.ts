@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { MongoClient, ObjectId } from 'mongodb';
 import { authenticate, authorize } from '../middleware/auth';
+import { MONGODB_URI } from '../config/database';
 
 const router = Router();
-const mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/mobile_store';
+const mongoUrl = MONGODB_URI;
 
 // Get all offers (Public)
 router.get('/', async (req, res) => {

@@ -4,7 +4,7 @@ import { SmsaService } from './shippingProviders/SmsaService';
 import { RedboxService } from './shippingProviders/RedboxService';
 import { AramexService } from './shippingProviders/AramexService';
 
-const mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/abaad_store';
+const mongoUrl = MONGODB_URI;;
 
 export class ShippingService {
   async getEnabledProviders(): Promise<ShippingProvider[]> {

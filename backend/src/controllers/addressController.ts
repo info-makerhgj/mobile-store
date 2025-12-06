@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { MongoClient, ObjectId } from 'mongodb';
 
-const mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/abaad_store';
+const mongoUrl = MONGODB_URI;;
 
 export const getAddresses = async (req: AuthRequest, res: Response) => {
   const client = new MongoClient(mongoUrl);

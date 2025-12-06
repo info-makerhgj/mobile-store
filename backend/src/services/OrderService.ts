@@ -4,7 +4,7 @@ import { calculateOrderPricing } from '../utils/calculations'
 import { validateShippingAddress, validateQuantity, normalizePhone } from '../utils/validators'
 import { ValidationError, StockError, OrderNotFoundError } from '../utils/errors'
 
-const mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/abaad_store'
+const mongoUrl = MONGODB_URI;
 
 export class OrderService {
   /**

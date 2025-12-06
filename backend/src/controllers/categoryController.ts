@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { MongoClient } from 'mongodb'
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/mobile-store'
+const mongoUrl = MONGODB_URI;
 
 async function getDb() {
   const client = new MongoClient(MONGODB_URI)

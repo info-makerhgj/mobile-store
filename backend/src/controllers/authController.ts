@@ -4,9 +4,10 @@ import jwt from 'jsonwebtoken'
 import { PrismaClient } from '@prisma/client'
 import { AuthRequest } from '../middleware/auth'
 import { MongoClient } from 'mongodb'
+import { MONGODB_URI } from '../config/database'
 
 const prisma = new PrismaClient()
-const mongoUrl = process.env.DATABASE_URL || process.env.MONGODB_URI || 'mongodb://localhost:27017/mobile_store'
+const mongoUrl = MONGODB_URI
 
 export const register = async (req: Request, res: Response) => {
   const client = new MongoClient(mongoUrl)

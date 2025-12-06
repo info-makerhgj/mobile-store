@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { MongoClient } from 'mongodb';
 
-const mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/mobile-store';
+const mongoUrl = MONGODB_URI;;
 
 // Get page by slug
 export const getPage = async (req: Request, res: Response) => {

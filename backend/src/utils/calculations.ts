@@ -61,7 +61,7 @@ export async function calculateCODFee(subtotal: number, paymentMethod: string): 
   
   try {
     const { MongoClient } = require('mongodb')
-    const mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/abaad_store'
+    const mongoUrl = MONGODB_URI;
     const client = new MongoClient(mongoUrl)
     
     await client.connect()

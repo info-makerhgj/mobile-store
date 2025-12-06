@@ -3,7 +3,7 @@ import { MongoClient, ObjectId } from 'mongodb'
 import { AuthRequest } from '../middleware/auth'
 import { PaymentService } from '../services/PaymentService'
 
-const mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/abaad_store'
+const mongoUrl = MONGODB_URI;
 const paymentService = new PaymentService()
 
 /**
