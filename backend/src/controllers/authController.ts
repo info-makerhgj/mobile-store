@@ -1,12 +1,10 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { PrismaClient } from '@prisma/client'
 import { AuthRequest } from '../middleware/auth'
 import { MongoClient } from 'mongodb'
 import { MONGODB_URI } from '../config/database'
 
-const prisma = new PrismaClient()
 const mongoUrl = MONGODB_URI
 
 export const register = async (req: Request, res: Response) => {

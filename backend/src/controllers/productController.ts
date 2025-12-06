@@ -1,8 +1,5 @@
 import { Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
 import { MongoClient, ObjectId } from 'mongodb'
-
-const prisma = new PrismaClient()
 
 export const getProducts = async (req: Request, res: Response) => {
   try {

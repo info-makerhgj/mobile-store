@@ -1,21 +1,34 @@
-import { PrismaClient } from '@prisma/client';
+import { MongoClient } from 'mongodb';
 
-const prisma = new PrismaClient();
+const MONGODB_URI = process.env.DATABASE_URL || 'mongodb://localhost:27017/mobile_store';
 
 export class SettingsService {
   async getSetting(key: string): Promise<any> {
-    const setting = await prisma.storeSettings.findUnique({
-      where: { key },
-    });
-    return setting?.value || null;
+    const client = new MongoClient(MONGODB_URI);
+    try {
+      await client.connect();
+      const db = client.db();
+      const setting = await db.collection('storeSettings').findOne({ key });
+      return setting?.value || null;
+    } finally {
+      await client.close();
+    }
   }
 
   async setSetting(key: string, value: any): Promise<any> {
-    return await prisma.storeSettings.upsert({
-      where: { key },
-      update: { value },
-      create: { key, value },
-    });
+    const client = new MongoClient(MONGODB_URI);
+    try {
+      await client.connect();
+      const db = client.db();
+      const result = await db.collection('storeSettings').updateOne(
+        { key },
+        { $set: { key, value, updatedAt: new Date() } },
+        { upsert: true }
+      );
+      return { key, value };
+    } finally {
+      await client.close();
+    }
   }
 
   async getTaxRate(): Promise<number> {
@@ -42,11 +55,18 @@ export class SettingsService {
   }
 
   async getAllSettings(): Promise<any> {
-    const settings = await prisma.storeSettings.findMany();
-    const result: any = {};
-    settings.forEach((s: any) => {
-      result[s.key] = s.value;
-    });
-    return result;
+    const client = new MongoClient(MONGODB_URI);
+    try {
+      await client.connect();
+      const db = client.db();
+      const settings = await db.collection('storeSettings').find({}).toArray();
+      const result: any = {};
+      settings.forEach((s: any) => {
+        result[s.key] = s.value;
+      });
+      return result;
+    } finally {
+      await client.close();
+    }
   }
 }
