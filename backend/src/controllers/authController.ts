@@ -6,7 +6,7 @@ import { AuthRequest } from '../middleware/auth'
 import { MongoClient } from 'mongodb'
 
 const prisma = new PrismaClient()
-const mongoUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017/abaad_store'
+const mongoUrl = process.env.DATABASE_URL || process.env.MONGODB_URI || 'mongodb://localhost:27017/mobile_store'
 
 export const register = async (req: Request, res: Response) => {
   const client = new MongoClient(mongoUrl)
@@ -72,21 +72,31 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body
     
+    console.log('🔍 Login attempt:', { email, passwordLength: password?.length })
+    
     await client.connect()
     const db = client.db()
     const usersCollection = db.collection('User')
     
     const user = await usersCollection.findOne({ email })
     
+    console.log('👤 User found:', user ? 'YES' : 'NO')
+    
     if (!user) {
+      console.log('❌ User not found in database')
       return res.status(401).json({ success: false, message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' })
     }
     
+    console.log('🔐 Comparing passwords...')
     const isValidPassword = await bcrypt.compare(password, user.password)
+    console.log('🔐 Password valid:', isValidPassword)
     
     if (!isValidPassword) {
+      console.log('❌ Password mismatch')
       return res.status(401).json({ success: false, message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' })
     }
+    
+    console.log('✅ Login successful for:', email)
     
     const token = jwt.sign(
       { userId: user._id.toString(), role: user.role },
@@ -104,7 +114,7 @@ export const login = async (req: Request, res: Response) => {
       },
     })
   } catch (error) {
-    console.error('Login error:', error)
+    console.error('❌ Login error:', error)
     res.status(500).json({ success: false, message: 'حدث خطأ في الخادم' })
   } finally {
     await client.close()
